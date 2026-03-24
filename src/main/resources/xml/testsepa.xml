@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<p:Document xmlns:p="http://univ.fr/sepa26"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://univ.fr/sepa26 sepa26.tp1.xsd">
+  <p:DrctDbtTxInf>
+    <p:PmtId>REF OPE test</p:PmtId>
+    <p:InstdAmt Ccy="EUR">1100.07</p:InstdAmt>
+    <p:DrctDbtTx>
+      <p:MndtRltdInf>
+        <p:MndtId>MANDAT NO 55555</p:MndtId>
+        <p:DtOfSgntr>2009-09-01</p:DtOfSgntr>
+      </p:MndtRltdInf>
+    </p:DrctDbtTx>
+    <p:DbtrAgt>
+      <p:FinInstnId>
+        <p:Id>NOTPROVIDED</p:Id>
+      </p:FinInstnId>
+    </p:DbtrAgt>
+    <p:Dbtr>
+      <p:Nm>Mr Debiteur N1</p:Nm>
+    </p:Dbtr>
+    <p:DbtrAcct>
+      <p:Id>
+        <p:IBAN>FR7630041362100001234567811</p:IBAN>
+      </p:Id>
+    </p:DbtrAcct>
+    <p:RmtInf>Facture N1</p:RmtInf>
+  </p:DrctDbtTxInf>
+</p:Document>
