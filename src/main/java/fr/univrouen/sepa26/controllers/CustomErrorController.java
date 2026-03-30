@@ -1,14 +1,15 @@
 package fr.univrouen.sepa26.controllers;
 
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.boot.web.servlet.error.ErrorController;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-@RestController
-public class CustomErrorController implements ErrorController {
+@Controller
+public class CustomErrorController implements org.springframework.boot.web.servlet.error.ErrorController {
 
     @RequestMapping("/error")
+    @ResponseBody
     public String handleError(HttpServletResponse response) {
         int status = response.getStatus();
         if (status == 404) {
