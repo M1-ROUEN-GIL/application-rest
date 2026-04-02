@@ -1,14 +1,18 @@
 package fr.univrouen.sepa26.model;
 
 import jakarta.xml.bind.annotation.*;
+import com.fasterxml.jackson.dataformat.xml.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement(name = "Document")
+@JacksonXmlRootElement(localName = "Document")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Document {
 
     @XmlElement(name = "DrctDbtTxInf")
+    @JacksonXmlProperty(localName = "DrctDbtTxInf")
+    @JacksonXmlElementWrapper(useWrapping = false)
     private List<DrctDbtTxInf> drctDbtTxInfs = new ArrayList<>();
 
     public List<DrctDbtTxInf> getDrctDbtTxInfs() {
@@ -22,24 +26,31 @@ public class Document {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class DrctDbtTxInf {
         @XmlElement(name = "PmtId")
+        @JacksonXmlProperty(localName = "PmtId")
         private String pmtId;
 
         @XmlElement(name = "InstdAmt")
+        @JacksonXmlProperty(localName = "InstdAmt")
         private InstdAmt instdAmt;
 
         @XmlElement(name = "DrctDbtTx")
+        @JacksonXmlProperty(localName = "DrctDbtTx")
         private DrctDbtTx drctDbtTx;
 
         @XmlElement(name = "DbtrAgt")
+        @JacksonXmlProperty(localName = "DbtrAgt")
         private DbtrAgt dbtrAgt;
 
         @XmlElement(name = "Dbtr")
+        @JacksonXmlProperty(localName = "Dbtr")
         private Dbtr dbtr;
 
         @XmlElement(name = "DbtrAcct")
+        @JacksonXmlProperty(localName = "DbtrAcct")
         private DbtrAcct dbtrAcct;
 
         @XmlElement(name = "RmtInf")
+        @JacksonXmlProperty(localName = "RmtInf")
         private String rmtInf;
 
         public String getPmtId() { return pmtId; }
@@ -61,8 +72,10 @@ public class Document {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class InstdAmt {
         @XmlValue
+        @JacksonXmlText
         private Double value;
         @XmlAttribute(name = "Ccy")
+        @JacksonXmlProperty(isAttribute = true, localName = "Ccy")
         private String ccy = "EUR";
 
         public Double getValue() { return value; }
@@ -74,6 +87,7 @@ public class Document {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class DrctDbtTx {
         @XmlElement(name = "MndtRltdInf")
+        @JacksonXmlProperty(localName = "MndtRltdInf")
         private MndtRltdInf mndtRltdInf;
 
         public MndtRltdInf getMndtRltdInf() { return mndtRltdInf; }
@@ -83,8 +97,10 @@ public class Document {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class MndtRltdInf {
         @XmlElement(name = "MndtId")
+        @JacksonXmlProperty(localName = "MndtId")
         private String mndtId;
         @XmlElement(name = "DtOfSgntr")
+        @JacksonXmlProperty(localName = "DtOfSgntr")
         private String dtOfSgntr; // Format xs:date (YYYY-MM-DD)
 
         public String getMndtId() { return mndtId; }
@@ -96,6 +112,7 @@ public class Document {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class DbtrAgt {
         @XmlElement(name = "FinInstnId")
+        @JacksonXmlProperty(localName = "FinInstnId")
         private FinInstnId finInstnId;
 
         public FinInstnId getFinInstnId() { return finInstnId; }
@@ -105,8 +122,10 @@ public class Document {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class FinInstnId {
         @XmlElement(name = "BIC")
+        @JacksonXmlProperty(localName = "BIC")
         private String bic;
         @XmlElement(name = "Id")
+        @JacksonXmlProperty(localName = "Id")
         private String id;
 
         public String getBic() { return bic; }
@@ -118,6 +137,7 @@ public class Document {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class Dbtr {
         @XmlElement(name = "Nm")
+        @JacksonXmlProperty(localName = "Nm")
         private String nm;
 
         public String getNm() { return nm; }
@@ -127,6 +147,7 @@ public class Document {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class DbtrAcct {
         @XmlElement(name = "Id")
+        @JacksonXmlProperty(localName = "Id")
         private DbtrAcctId id;
 
         public DbtrAcctId getId() { return id; }
@@ -136,8 +157,10 @@ public class Document {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class DbtrAcctId {
         @XmlElement(name = "IBAN")
+        @JacksonXmlProperty(localName = "IBAN")
         private String iban;
         @XmlElement(name = "PrvtId")
+        @JacksonXmlProperty(localName = "PrvtId")
         private String prvtId;
 
         public String getIban() { return iban; }
@@ -146,3 +169,4 @@ public class Document {
         public void setPrvtId(String prvtId) { this.prvtId = prvtId; }
     }
 }
+
