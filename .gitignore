@@ -6,3 +6,40 @@ target/
 *.class
 
 .DS_Store
+
+# Env files
+.env
+
+# LaTeX
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+*.blg
+*.bbl
+*.lof
+*.lot
+*.nav
+*.snm
+*.vrb
+*.dvi
+*.ps
+*.gz
+*.pdfsync
+*.alg
+*.acn
+*.acr
+*.glg
+*.glo
+*.gls
+*.ist
+*.maf
+*.mtc
+*.mtc0
+*.pyg
+*.bcf
+*.run.xml
+*.synctex(busy)
