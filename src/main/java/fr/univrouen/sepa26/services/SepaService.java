@@ -53,10 +53,17 @@ public class SepaService {
 
     /**
      * Sauvegarde un document en base de données.
+     * Réalise une vérification de l'unicité du PmtId (contrainte métier SEPA).
      * @param doc Le document à enregistrer.
-     * @return Le document sauvegardé avec son ID généré.
+     * @return Le document sauvegardé avec son ID généré, ou null si un doublon de PmtId est détecté.
      */
     public Document save(Document doc) {
+        if (!doc.getDrctDbtTxInfs().isEmpty()) {
+            String pmtId = doc.getDrctDbtTxInfs().get(0).getPmtId();
+            if (pmtId != null && exists(pmtId)) {
+                return null;
+            }
+        }
         return repository.save(doc);
     }
 

@@ -26,7 +26,7 @@ public class PostController {
 
     /**
      * Ajoute un nouveau document SEPA.
-     * Réalise une validation XSD et vérifie l'unicité du PmtId.
+     * Réalise une validation XSD et vérifie l'unicité du PmtId via le service.
      * @param doc Le document envoyé dans le corps de la requête.
      * @return Un objet SepaResponse (INSERTED ou ERROR).
      */
@@ -37,16 +37,11 @@ public class PostController {
             return new SepaResponse("ERROR");
         }
 
-        // 2. Vérification unicité PmtId (contrainte métier SEPA)
-        if (!doc.getDrctDbtTxInfs().isEmpty()) {
-            String pmtId = doc.getDrctDbtTxInfs().get(0).getPmtId();
-            if (sepaService.exists(pmtId)) {
-                return new SepaResponse("ERROR");
-            }
-        }
-
-        // 3. Sauvegarde
+        // 2. Sauvegarde (la vérification métier PmtId est faite dans le service)
         Document saved = sepaService.save(doc);
+        if (saved == null) {
+            return new SepaResponse("ERROR");
+        }
         return new SepaResponse(saved.getId(), "INSERTED");
     }
 

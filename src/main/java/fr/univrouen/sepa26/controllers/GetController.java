@@ -1,5 +1,6 @@
 package fr.univrouen.sepa26.controllers;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,17 @@ public class GetController {
     }
 
     /**
+     * Affiche la liste des 10 derniers documents au format HTML.
+     * @param model Le modèle Spring UI.
+     * @return Le nom de la vue "summary".
+     */
+    @GetMapping(value = "/resume/html", produces = MediaType.TEXT_HTML_VALUE)
+    public String getResumeHtml(Model model) {
+        model.addAttribute("documents", sepaService.getLast10());
+        return "summary";
+    }
+
+    /**
      * Retourne le détail d'un document au format XML.
      * @param id L'identifiant technique du document.
      * @return Le document en XML ou une réponse d'erreur.
@@ -62,7 +74,8 @@ public class GetController {
     public String getHtmlDetail(@PathVariable long id, Model model) {
         Optional<Document> doc = sepaService.getById(id);
         if (doc.isPresent()) {
-            model.addAttribute("document", doc.get());
+            // summary.html attend une liste nommée "documents"
+            model.addAttribute("documents", List.of(doc.get()));
             return "summary";
         }
         model.addAttribute("id", id);
