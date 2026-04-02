@@ -6,6 +6,12 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Entité représentant un document SEPA.
+ * Cette classe fait double office :
+ * 1. Entité JPA pour la persistance en base de données SQL.
+ * 2. Modèle JAXB/Jackson pour la désérialisation XML.
+ */
 @XmlRootElement(name = "Document")
 @JacksonXmlRootElement(localName = "Document")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -13,19 +19,23 @@ import java.util.List;
 @Table(name = "documents")
 public class Document {
 
+    /** Identifiant unique en base de données */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @XmlTransient
     private Long id;
 
+    /** Date et heure de création du document */
     @XmlElement(name = "CreDtTm")
     @JacksonXmlProperty(localName = "CreDtTm")
     private String creDtTm;
 
+    /** Somme de contrôle pour validation */
     @XmlElement(name = "CtrlSum")
     @JacksonXmlProperty(localName = "CtrlSum")
     private Double ctrlSum;
 
+    /** Liste des informations de transactions de débit direct */
     @XmlElement(name = "DrctDbtTxInf")
     @JacksonXmlProperty(localName = "DrctDbtTxInf")
     @JacksonXmlElementWrapper(useWrapping = false)
@@ -50,6 +60,9 @@ public class Document {
         this.drctDbtTxInfs = drctDbtTxInfs;
     }
 
+    /**
+     * Classe interne représentant le détail d'une transaction de débit direct.
+     */
     @XmlAccessorType(XmlAccessType.FIELD)
     @Entity
     @Table(name = "transaction_info")
@@ -59,36 +72,43 @@ public class Document {
         @XmlTransient
         private Long id;
 
+        /** Identifiant unique de l'instruction de paiement */
         @XmlElement(name = "PmtId")
         @JacksonXmlProperty(localName = "PmtId")
         @Column(unique = true)
         private String pmtId;
 
+        /** Montant de la transaction */
         @XmlElement(name = "InstdAmt")
         @JacksonXmlProperty(localName = "InstdAmt")
         @Embedded
         private InstdAmt instdAmt;
 
+        /** Informations spécifiques au débit direct */
         @XmlElement(name = "DrctDbtTx")
         @JacksonXmlProperty(localName = "DrctDbtTx")
         @Embedded
         private DrctDbtTx drctDbtTx;
 
+        /** Agent du débiteur (Banque) */
         @XmlElement(name = "DbtrAgt")
         @JacksonXmlProperty(localName = "DbtrAgt")
         @Embedded
         private DbtrAgt dbtrAgt;
 
+        /** Information sur le débiteur */
         @XmlElement(name = "Dbtr")
         @JacksonXmlProperty(localName = "Dbtr")
         @Embedded
         private Dbtr dbtr;
 
+        /** Compte du débiteur */
         @XmlElement(name = "DbtrAcct")
         @JacksonXmlProperty(localName = "DbtrAcct")
         @Embedded
         private DbtrAcct dbtrAcct;
 
+        /** Informations de remise (Libellé du virement) */
         @XmlElement(name = "RmtInf")
         @JacksonXmlProperty(localName = "RmtInf")
         private String rmtInf;
@@ -111,13 +131,16 @@ public class Document {
         public void setRmtInf(String rmtInf) { this.rmtInf = rmtInf; }
     }
 
+    /** Représentation du montant instruit */
     @XmlAccessorType(XmlAccessType.FIELD)
     @Embeddable
     public static class InstdAmt {
+        /** Valeur numérique du montant */
         @XmlValue
         @JacksonXmlText
         @Column(name = "amount_value")
         private Double value;
+        /** Code devise (ex: EUR) */
         @XmlAttribute(name = "Ccy")
         @JacksonXmlProperty(isAttribute = true, localName = "Ccy")
         @Column(name = "amount_ccy")
@@ -129,9 +152,11 @@ public class Document {
         public void setCcy(String ccy) { this.ccy = ccy; }
     }
 
+    /** Informations de débit direct */
     @XmlAccessorType(XmlAccessType.FIELD)
     @Embeddable
     public static class DrctDbtTx {
+        /** Informations relatives au mandat */
         @XmlElement(name = "MndtRltdInf")
         @JacksonXmlProperty(localName = "MndtRltdInf")
         @Embedded
@@ -141,13 +166,16 @@ public class Document {
         public void setMndtRltdInf(MndtRltdInf mndtRltdInf) { this.mndtRltdInf = mndtRltdInf; }
     }
 
+    /** Informations sur le mandat SEPA */
     @XmlAccessorType(XmlAccessType.FIELD)
     @Embeddable
     public static class MndtRltdInf {
+        /** Identifiant du mandat */
         @XmlElement(name = "MndtId")
         @JacksonXmlProperty(localName = "MndtId")
         @Column(name = "mndt_id")
         private String mndtId;
+        /** Date de signature du mandat */
         @XmlElement(name = "DtOfSgntr")
         @JacksonXmlProperty(localName = "DtOfSgntr")
         @Column(name = "dt_of_sgntr")
@@ -159,9 +187,11 @@ public class Document {
         public void setDtOfSgntr(String dtOfSgntr) { this.dtOfSgntr = dtOfSgntr; }
     }
 
+    /** Agent du débiteur */
     @XmlAccessorType(XmlAccessType.FIELD)
     @Embeddable
     public static class DbtrAgt {
+        /** Identification de l'institution financière */
         @XmlElement(name = "FinInstnId")
         @JacksonXmlProperty(localName = "FinInstnId")
         @Embedded
@@ -171,13 +201,16 @@ public class Document {
         public void setFinInstnId(FinInstnId finInstnId) { this.finInstnId = finInstnId; }
     }
 
+    /** Identification de l'institution financière */
     @XmlAccessorType(XmlAccessType.FIELD)
     @Embeddable
     public static class FinInstnId {
+        /** Code BIC de la banque */
         @XmlElement(name = "BIC")
         @JacksonXmlProperty(localName = "BIC")
         @Column(name = "agent_bic")
         private String bic;
+        /** Identifiant optionnel de l'institution */
         @XmlElement(name = "Id")
         @JacksonXmlProperty(localName = "Id")
         @Column(name = "agent_id")
@@ -189,9 +222,11 @@ public class Document {
         public void setId(String id) { this.id = id; }
     }
 
+    /** Le débiteur */
     @XmlAccessorType(XmlAccessType.FIELD)
     @Embeddable
     public static class Dbtr {
+        /** Nom du débiteur */
         @XmlElement(name = "Nm")
         @JacksonXmlProperty(localName = "Nm")
         @Column(name = "dbtr_nm")
@@ -201,9 +236,11 @@ public class Document {
         public void setNm(String nm) { this.nm = nm; }
     }
 
+    /** Compte du débiteur */
     @XmlAccessorType(XmlAccessType.FIELD)
     @Embeddable
     public static class DbtrAcct {
+        /** Identification du compte */
         @XmlElement(name = "Id")
         @JacksonXmlProperty(localName = "Id")
         @Embedded
@@ -213,13 +250,16 @@ public class Document {
         public void setId(DbtrAcctId id) { this.id = id; }
     }
 
+    /** Identification du compte du débiteur */
     @XmlAccessorType(XmlAccessType.FIELD)
     @Embeddable
     public static class DbtrAcctId {
+        /** Code IBAN du compte */
         @XmlElement(name = "IBAN")
         @JacksonXmlProperty(localName = "IBAN")
         @Column(name = "dbtr_iban")
         private String iban;
+        /** Identifiant privé (si pas d'IBAN) */
         @XmlElement(name = "PrvtId")
         @JacksonXmlProperty(localName = "PrvtId")
         @Column(name = "dbtr_prvt_id")

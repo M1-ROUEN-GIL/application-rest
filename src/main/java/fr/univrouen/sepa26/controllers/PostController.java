@@ -10,11 +10,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.univrouen.sepa26.model.Document;
-import fr.univrouen.sepa26.model.SepaResponse;
+import fr.univrouen.sepa26.dto.SepaResponse;
 import fr.univrouen.sepa26.services.SepaService;
 
 /**
- * Contrôleur gérant les modifications de données (POST, DELETE).
+ * Contrôleur REST gérant les modifications de données.
+ * Traite les envois (POST) et les suppressions (DELETE) de documents.
  */
 @RestController
 @RequestMapping("/sepa26")
@@ -24,8 +25,10 @@ public class PostController {
     private SepaService sepaService;
 
     /**
-     * Insère un nouveau flux SEPA dans la base.
-     * Valide le flux via XSD et vérifie l'unicité avant l'insertion.
+     * Ajoute un nouveau document SEPA.
+     * Réalise une validation XSD et vérifie l'unicité du PmtId.
+     * @param doc Le document envoyé dans le corps de la requête.
+     * @return Un objet SepaResponse (INSERTED ou ERROR).
      */
     @PostMapping(value = "/insert", consumes = MediaType.APPLICATION_XML_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
     public SepaResponse insert(@RequestBody Document doc) {
@@ -34,17 +37,23 @@ public class PostController {
             return new SepaResponse("ERROR");
         }
 
-        // 2. Enregistrement (vérifie l'unicité du PmtId)
-        Document saved = sepaService.save(doc);
-        if (saved == null) {
-            return new SepaResponse("ERROR");
+        // 2. Vérification unicité PmtId (contrainte métier SEPA)
+        if (!doc.getDrctDbtTxInfs().isEmpty()) {
+            String pmtId = doc.getDrctDbtTxInfs().get(0).getPmtId();
+            if (sepaService.exists(pmtId)) {
+                return new SepaResponse("ERROR");
+            }
         }
 
+        // 3. Sauvegarde
+        Document saved = sepaService.save(doc);
         return new SepaResponse(saved.getId(), "INSERTED");
     }
 
     /**
-     * Supprime une transaction par son identifiant.
+     * Supprime un document par son identifiant.
+     * @param id L'ID du document à supprimer.
+     * @return Un objet SepaResponse (DELETED ou ERROR).
      */
     @DeleteMapping(value = "/delete/{id}", produces = MediaType.APPLICATION_XML_VALUE)
     public SepaResponse delete(@PathVariable long id) {

@@ -14,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import fr.univrouen.sepa26.model.Document;
-import fr.univrouen.sepa26.model.DocumentRepository;
+import fr.univrouen.sepa26.repository.DocumentRepository;
 
 /**
  * Tests unitaires pour le service SepaService.

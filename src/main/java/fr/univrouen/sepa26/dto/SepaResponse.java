@@ -1,18 +1,24 @@
-package fr.univrouen.sepa26.model;
+package fr.univrouen.sepa26.dto;
 
 import jakarta.xml.bind.annotation.*;
 import com.fasterxml.jackson.dataformat.xml.annotation.*;
 
+/**
+ * Objet de transfert de données (DTO) pour les réponses standard de l'API.
+ * Utilisé pour informer l'utilisateur du succès ou de l'échec d'une opération.
+ */
 @XmlRootElement(name = "SepaResponse")
 @JacksonXmlRootElement(localName = "SepaResponse")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = {"id", "status"})
 public class SepaResponse {
 
+    /** Identifiant de la ressource concernée (optionnel) */
     @XmlElement
     @JacksonXmlProperty(localName = "id")
     private Long id;
 
+    /** Statut de l'opération (ex: INSERTED, DELETED, ERROR) */
     @XmlElement
     @JacksonXmlProperty(localName = "status")
     private String status;
