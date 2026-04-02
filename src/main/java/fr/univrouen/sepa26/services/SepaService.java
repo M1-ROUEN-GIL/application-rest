@@ -61,6 +61,7 @@ public class SepaService {
             validator.validate(source);
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
             System.err.println("Erreur de validation XSD : " + e.getMessage());
             return false;
         }
