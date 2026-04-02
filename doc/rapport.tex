@@ -108,7 +108,7 @@
 \begin{titlepage}
     \centering
     \vspace*{5cm}
-    {\Huge \bfseries \color{mainblue} Infrastructure de Données}\\[0.5cm]
+    {\Huge \bfseries \color{mainblue} Infrastructure de Données et Service REST}\\[0.5cm]
     {\Large Projet SEPA26}\\[2cm]
     
     \vfill
@@ -120,13 +120,13 @@
 \newpage
 
 \section{Introduction}
-Ce document présente la mise en œuvre de la persistance des données pour le projet SEPA26. L'architecture repose sur MariaDB pour le stockage.
+Ce document présente la mise en œuvre du service REST SEPA26, incluant la persistance des données et les fonctionnalités de consultation et de gestion des flux bancaires. L'architecture repose sur Spring Boot, MariaDB et les standards XML/XSD.
 
 \section{Gestion de la Base de Données}
 Le choix s'est porté sur \textbf{MariaDB}, une base de données relationnelle performante et open-source.
 
 \subsection{Conteneurisation avec Docker}
-L'instance MariaDB est déployée via \texttt{docker-compose.yml}. Cette approche garantit la portabilité de l'environnement de développement et de production. Par mesure de sécurité, les identifiants sont externalisés dans un fichier \texttt{.env}.
+L'instance MariaDB est déployée via \texttt{docker-compose.yml}. Cette approche garantit la portabilité de l'environnement. Par mesure de sécurité, les identifiants sont externalisés dans un fichier \texttt{.env}.
 
 \begin{lstlisting}[language=yaml, caption=Configuration Docker Compose]
 services:
@@ -142,10 +142,34 @@ services:
       - mariadb_data:/var/lib/mysql
 \end{lstlisting}
 
-\subsection{Persistance des Données}
-Conformément aux exigences de pérennité, un \textbf{volume Docker} nommé \texttt{mariadb\_data} est utilisé. Les données sont stockées sur l'hôte physique, ce qui permet de conserver les informations même si le conteneur est supprimé ou mis à jour.
+\subsection{Persistance des Données (JPA/Hibernate)}
+La persistance est assurée par \textbf{Spring Data JPA}. Le modèle de données \texttt{Document} a été annoté pour correspondre à la structure de la base de données, permettant un mapping automatique entre les objets Java et les tables SQL.
+
+\section{Service REST}
+Le service expose plusieurs points d'entrée (endpoints) pour la gestion des flux SEPA.
+
+\subsection{Consultation}
+\begin{itemize}
+    \item \textbf{Accueil} (\texttt{/}) : Présentation du projet et des auteurs.
+    \item \textbf{Aide} (\texttt{/help}) : Documentation interactive des API.
+    \item \textbf{Résumé} (\texttt{/sepa26/resume/xml} \& \texttt{/html}) : Listes simplifiées des transactions.
+    \item \textbf{Détail} (\texttt{/sepa26/xml/\{id\}} \& \texttt{/html/\{id\}}) : Consultation complète d'une transaction, avec transformation XSLT pour le rendu HTML.
+\end{itemize}
+
+\subsection{Gestion des flux}
+\begin{itemize}
+    \item \textbf{Insertion} (\texttt{POST /sepa26/insert}) : Ajout d'un flux après validation par schéma XSD et vérification d'unicité.
+    \item \textbf{Suppression} (\texttt{DELETE /sepa26/delete/\{id\}}) : Retrait d'une transaction de la base.
+\end{itemize}
+
+\section{Validation et Transformation}
+La robustesse du système est garantie par :
+\begin{enumerate}
+    \item \textbf{Validation XSD} : Chaque flux entrant est validé par rapport au schéma officiel pour garantir l'intégrité des données.
+    \item \textbf{Transformation XSLT} : Le rendu HTML des transactions est généré dynamiquement à partir du flux XML via un processeur XSLT.
+\end{enumerate}
 
 \section{Conclusion}
-L'utilisation de Docker pour la base de données assure une infrastructure robuste et sécurisée contre la perte de données.
+L'architecture logicielle choisie offre une séparation claire des responsabilités, une sécurité renforcée des identifiants et une interopérabilité maximale grâce aux standards XML.
 
 \end{document}

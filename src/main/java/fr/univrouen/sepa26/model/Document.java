@@ -2,18 +2,45 @@ package fr.univrouen.sepa26.model;
 
 import jakarta.xml.bind.annotation.*;
 import com.fasterxml.jackson.dataformat.xml.annotation.*;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement(name = "Document")
 @JacksonXmlRootElement(localName = "Document")
 @XmlAccessorType(XmlAccessType.FIELD)
+@Entity
+@Table(name = "documents")
 public class Document {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @XmlTransient
+    private Long id;
+
+    @XmlElement(name = "CreDtTm")
+    @JacksonXmlProperty(localName = "CreDtTm")
+    private String creDtTm;
+
+    @XmlElement(name = "CtrlSum")
+    @JacksonXmlProperty(localName = "CtrlSum")
+    private Double ctrlSum;
 
     @XmlElement(name = "DrctDbtTxInf")
     @JacksonXmlProperty(localName = "DrctDbtTxInf")
     @JacksonXmlElementWrapper(useWrapping = false)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "document_id")
     private List<DrctDbtTxInf> drctDbtTxInfs = new ArrayList<>();
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getCreDtTm() { return creDtTm; }
+    public void setCreDtTm(String creDtTm) { this.creDtTm = creDtTm; }
+
+    public Double getCtrlSum() { return ctrlSum; }
+    public void setCtrlSum(Double ctrlSum) { this.ctrlSum = ctrlSum; }
 
     public List<DrctDbtTxInf> getDrctDbtTxInfs() {
         return drctDbtTxInfs;
@@ -24,35 +51,50 @@ public class Document {
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
+    @Entity
+    @Table(name = "transaction_info")
     public static class DrctDbtTxInf {
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @XmlTransient
+        private Long id;
+
         @XmlElement(name = "PmtId")
         @JacksonXmlProperty(localName = "PmtId")
+        @Column(unique = true)
         private String pmtId;
 
         @XmlElement(name = "InstdAmt")
         @JacksonXmlProperty(localName = "InstdAmt")
+        @Embedded
         private InstdAmt instdAmt;
 
         @XmlElement(name = "DrctDbtTx")
         @JacksonXmlProperty(localName = "DrctDbtTx")
+        @Embedded
         private DrctDbtTx drctDbtTx;
 
         @XmlElement(name = "DbtrAgt")
         @JacksonXmlProperty(localName = "DbtrAgt")
+        @Embedded
         private DbtrAgt dbtrAgt;
 
         @XmlElement(name = "Dbtr")
         @JacksonXmlProperty(localName = "Dbtr")
+        @Embedded
         private Dbtr dbtr;
 
         @XmlElement(name = "DbtrAcct")
         @JacksonXmlProperty(localName = "DbtrAcct")
+        @Embedded
         private DbtrAcct dbtrAcct;
 
         @XmlElement(name = "RmtInf")
         @JacksonXmlProperty(localName = "RmtInf")
         private String rmtInf;
 
+        public Long getId() { return id; }
+        public void setId(Long id) { this.id = id; }
         public String getPmtId() { return pmtId; }
         public void setPmtId(String pmtId) { this.pmtId = pmtId; }
         public InstdAmt getInstdAmt() { return instdAmt; }
@@ -70,12 +112,15 @@ public class Document {
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
+    @Embeddable
     public static class InstdAmt {
         @XmlValue
         @JacksonXmlText
+        @Column(name = "amount_value")
         private Double value;
         @XmlAttribute(name = "Ccy")
         @JacksonXmlProperty(isAttribute = true, localName = "Ccy")
+        @Column(name = "amount_ccy")
         private String ccy = "EUR";
 
         public Double getValue() { return value; }
@@ -85,9 +130,11 @@ public class Document {
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
+    @Embeddable
     public static class DrctDbtTx {
         @XmlElement(name = "MndtRltdInf")
         @JacksonXmlProperty(localName = "MndtRltdInf")
+        @Embedded
         private MndtRltdInf mndtRltdInf;
 
         public MndtRltdInf getMndtRltdInf() { return mndtRltdInf; }
@@ -95,13 +142,16 @@ public class Document {
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
+    @Embeddable
     public static class MndtRltdInf {
         @XmlElement(name = "MndtId")
         @JacksonXmlProperty(localName = "MndtId")
+        @Column(name = "mndt_id")
         private String mndtId;
         @XmlElement(name = "DtOfSgntr")
         @JacksonXmlProperty(localName = "DtOfSgntr")
-        private String dtOfSgntr; // Format xs:date (YYYY-MM-DD)
+        @Column(name = "dt_of_sgntr")
+        private String dtOfSgntr;
 
         public String getMndtId() { return mndtId; }
         public void setMndtId(String mndtId) { this.mndtId = mndtId; }
@@ -110,9 +160,11 @@ public class Document {
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
+    @Embeddable
     public static class DbtrAgt {
         @XmlElement(name = "FinInstnId")
         @JacksonXmlProperty(localName = "FinInstnId")
+        @Embedded
         private FinInstnId finInstnId;
 
         public FinInstnId getFinInstnId() { return finInstnId; }
@@ -120,12 +172,15 @@ public class Document {
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
+    @Embeddable
     public static class FinInstnId {
         @XmlElement(name = "BIC")
         @JacksonXmlProperty(localName = "BIC")
+        @Column(name = "agent_bic")
         private String bic;
         @XmlElement(name = "Id")
         @JacksonXmlProperty(localName = "Id")
+        @Column(name = "agent_id")
         private String id;
 
         public String getBic() { return bic; }
@@ -135,9 +190,11 @@ public class Document {
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
+    @Embeddable
     public static class Dbtr {
         @XmlElement(name = "Nm")
         @JacksonXmlProperty(localName = "Nm")
+        @Column(name = "dbtr_nm")
         private String nm;
 
         public String getNm() { return nm; }
@@ -145,9 +202,11 @@ public class Document {
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
+    @Embeddable
     public static class DbtrAcct {
         @XmlElement(name = "Id")
         @JacksonXmlProperty(localName = "Id")
+        @Embedded
         private DbtrAcctId id;
 
         public DbtrAcctId getId() { return id; }
@@ -155,12 +214,15 @@ public class Document {
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
+    @Embeddable
     public static class DbtrAcctId {
         @XmlElement(name = "IBAN")
         @JacksonXmlProperty(localName = "IBAN")
+        @Column(name = "dbtr_iban")
         private String iban;
         @XmlElement(name = "PrvtId")
         @JacksonXmlProperty(localName = "PrvtId")
+        @Column(name = "dbtr_prvt_id")
         private String prvtId;
 
         public String getIban() { return iban; }
@@ -169,4 +231,3 @@ public class Document {
         public void setPrvtId(String prvtId) { this.prvtId = prvtId; }
     }
 }
-

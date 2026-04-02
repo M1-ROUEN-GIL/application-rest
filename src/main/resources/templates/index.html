@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Accueil - Projet SEPA26</title>
+    <link rel="stylesheet" th:href="@{/sepa26.css}">
+</head>
+<body>
+    <header>
+        <img src="https://www.univ-rouen.fr/wp-content/themes/univ-rouen/assets/img/logo-universite-rouen-normandie.svg" alt="Logo Université de Rouen" width="250">
+        <h1>Bienvenue sur le service REST SEPA26</h1>
+    </header>
+    
+    <main>
+        <section>
+            <h2>Informations du projet</h2>
+            <ul>
+                <li><strong>Nom du projet :</strong> <span th:text="${projectName}">SEPA26</span></li>
+                <li><strong>Version :</strong> <span th:text="${version}">0.0.1</span></li>
+                <li><strong>Développeur :</strong> <span th:text="${developer}">Étudiant</span></li>
+            </ul>
+        </section>
+        
+        <nav>
+            <h2>Navigation</h2>
+            <ul>
+                <li><a th:href="@{/help}">Page d'aide</a></li>
+                <li><a th:href="@{/resume}">Résumé des flux</a></li>
+                <li><a th:href="@{/xml}">Exemple XML</a></li>
+            </ul>
+        </nav>
+    </main>
+    
+    <footer>
+        <p>&copy; 2026 Université de Rouen Normandie</p>
+    </footer>
+</body>
+</html>

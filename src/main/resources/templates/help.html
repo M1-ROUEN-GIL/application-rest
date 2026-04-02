@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Aide - Projet SEPA26</title>
+    <link rel="stylesheet" th:href="@{/sepa26.css}">
+</head>
+<body>
+    <header>
+        <h1>Aide du service REST SEPA26</h1>
+        <p><a th:href="@{/}">Retour à l'accueil</a></p>
+    </header>
+    
+    <main>
+        <table>
+            <thead>
+                <tr>
+                    <th>URL</th>
+                    <th>Méthode</th>
+                    <th>Opération</th>
+                    <th>Retour / Formats</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>/</code></td>
+                    <td>GET</td>
+                    <td>Affiche la page d'accueil du projet</td>
+                    <td>HTML</td>
+                </tr>
+                <tr>
+                    <td><code>/help</code></td>
+                    <td>GET</td>
+                    <td>Affiche cette page d'aide</td>
+                    <td>HTML</td>
+                </tr>
+                <tr>
+                    <td><code>/resume</code></td>
+                    <td>GET</td>
+                    <td>Affiche la liste des flux SEPA enregistrés</td>
+                    <td>XML / Texte</td>
+                </tr>
+                <tr>
+                    <td><code>/guid?guid=...</code></td>
+                    <td>GET</td>
+                    <td>Affiche le détail d'une transaction SEPA via son identifiant</td>
+                    <td>XML / Texte</td>
+                </tr>
+                <tr>
+                    <td><code>/xml</code></td>
+                    <td>GET</td>
+                    <td>Affiche un exemple de document SEPA au format XML</td>
+                    <td>XML</td>
+                </tr>
+                <tr>
+                    <td><code>/testpost</code></td>
+                    <td>POST</td>
+                    <td>Envoie un document XML pour test et le renvoie</td>
+                    <td>Consomme XML, Produit XML</td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+    
+    <footer>
+        <p>&copy; 2026 Université de Rouen Normandie</p>
+    </footer>
+</body>
+</html>
