@@ -125,23 +125,6 @@ Ce document présente la mise en œuvre du service REST SEPA26, incluant la pers
 \section{Gestion de la Base de Données}
 Le choix s'est porté sur \textbf{MariaDB}, une base de données relationnelle performante et open-source.
 
-\subsection{Conteneurisation avec Docker}
-L'instance MariaDB est déployée via \texttt{docker-compose.yml}. Cette approche garantit la portabilité de l'environnement. Par mesure de sécurité, les identifiants sont externalisés dans un fichier \texttt{.env}.
-
-\begin{lstlisting}[language=yaml, caption=Configuration Docker Compose]
-services:
-  mariadb:
-    image: mariadb:latest
-    container_name: sepa26-db
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    volumes:
-      - mariadb_data:/var/lib/mysql
-\end{lstlisting}
-
 \subsection{Persistance des Données (JPA/Hibernate)}
 La persistance est assurée par \textbf{Spring Data JPA}. Le modèle de données \texttt{Document} a été annoté pour correspondre à la structure de la base de données, permettant un mapping automatique entre les objets Java et les tables SQL.
 
@@ -164,6 +147,38 @@ Le service expose plusieurs points d'entrée (endpoints) pour la gestion des flu
     \item \textbf{Insertion} (\texttt{POST /sepa26/insert}) : Ajout d'un flux après validation par schéma XSD et vérification d'unicité.
     \item \textbf{Suppression} (\texttt{DELETE /sepa26/delete/\{id\}}) : Retrait d'une transaction de la base.
 \end{itemize}
+
+\subsubsection*{Exemple de test d'insertion (cURL)}
+Pour tester l'insertion, la commande suivante peut être utilisée :
+\begin{lstlisting}[language=bash, caption=Commande cURL pour l'insertion]
+curl -X POST http://10.130.162.188:8100/sepa26/insert \
+-H "Content-Type: application/xml" \
+-d '<Document xmlns="http://univ.fr/sepa26">
+  <DrctDbtTxInf>
+    <PmtId>REF-DOC-123</PmtId>
+    <InstdAmt Ccy="EUR">150.00</InstdAmt>
+    <DrctDbtTx>
+      <MndtRltdInf>
+        <MndtId>MANDAT-999</MndtId>
+        <DtOfSgntr>2026-03-01</DtOfSgntr>
+      </MndtRltdInf>
+    </DrctDbtTx>
+    <DbtrAgt>
+      <FinInstnId>
+        <BIC>ROUENSWNXXX</BIC>
+      </FinInstnId>
+    </DbtrAgt>
+    <Dbtr>
+      <Nm>Jean Dupont</Nm>
+    </Dbtr>
+    <DbtrAcct>
+      <Id>
+        <IBAN>FR7612345678901234567890123</IBAN>
+      </Id>
+    </DbtrAcct>
+  </DrctDbtTxInf>
+</Document>'
+\end{lstlisting}
 
 \section{Validation et Transformation}
 La robustesse du système est garantie par :
