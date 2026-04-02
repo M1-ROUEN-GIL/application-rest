@@ -180,6 +180,12 @@ curl -X POST http://10.130.162.188:8100/sepa26/insert \
 </Document>'
 \end{lstlisting}
 
+\subsubsection*{Exemple de test de suppression (cURL)}
+Pour supprimer une transaction (par exemple l'ID 1), la commande suivante peut être utilisée :
+\begin{lstlisting}[language=bash, caption=Commande cURL pour la suppression]
+curl -X DELETE http://10.130.162.188:8100/sepa26/delete/1
+\end{lstlisting}
+
 \section{Validation et Transformation}
 La robustesse du système est garantie par :
 \begin{enumerate}
