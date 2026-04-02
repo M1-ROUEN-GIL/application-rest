@@ -1,8 +1,14 @@
 package fr.univrouen.sepa26.services;
 
 import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.List;
+
 import javax.xml.XMLConstants;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -15,11 +21,12 @@ import org.springframework.stereotype.Service;
 import fr.univrouen.sepa26.model.Document;
 import fr.univrouen.sepa26.model.DocumentRepository;
 import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.util.JAXBSource;
 
 /**
  * Service gérant la logique métier des flux SEPA.
- * Assure la persistance, la validation XSD et la gestion des données.
+ * Assure la persistance, la validation XSD et la transformation des données.
  */
 @Service
 public class SepaService {
@@ -93,5 +100,33 @@ public class SepaService {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Transforme un document XML en HTML via XSLT.
+     * @param doc Le document à transformer
+     * @return La chaîne HTML résultante
+     */
+    public String transformToHtml(Document doc) {
+        try {
+            // Marshalling JAXB vers String
+            JAXBContext context = JAXBContext.newInstance(Document.class);
+            Marshaller marshaller = context.createMarshaller();
+            StringWriter writer = new StringWriter();
+            marshaller.marshal(doc, writer);
+            String xml = writer.toString();
+
+            // Transformation XSLT
+            TransformerFactory factory = TransformerFactory.newInstance();
+            InputStream xsltStream = new ClassPathResource("xml/sepa26.tp3.xslt").getInputStream();
+            Transformer transformer = factory.newTransformer(new StreamSource(xsltStream));
+            
+            StringWriter resultWriter = new StringWriter();
+            transformer.transform(new StreamSource(new StringReader(xml)), new StreamResult(resultWriter));
+            
+            return resultWriter.toString();
+        } catch (Exception e) {
+            return "<html><body><h1>Erreur lors de la transformation</h1><p>" + e.getMessage() + "</p></body></html>";
+        }
     }
 }

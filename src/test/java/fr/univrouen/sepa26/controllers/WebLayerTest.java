@@ -116,7 +116,7 @@ public class WebLayerTest {
         // 5. Verify deleted
         this.mockMvc.perform(get("/sepa26/xml/" + id).accept(MediaType.APPLICATION_XML))
                 .andExpect(status().isOk())
-                .andExpect(xpath("/error/status").string("ERROR"));
+                .andExpect(xpath("/SepaResponse/status").string("ERROR"));
     }
 
     @Test
