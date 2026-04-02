@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,8 +44,7 @@ public class GetController {
     public String getResumeHtml(Model model) {
         List<Document> docs = sepaService.getLast10();
         model.addAttribute("documents", docs);
-        // summary.html
-        return "summary";
+        return "summary"; // summary.html
     }
 
     /**
@@ -55,22 +55,27 @@ public class GetController {
     public Object getXmlDetail(@PathVariable long id) {
         Document doc = sepaService.getById(id);
         if (doc == null) {
-        	// Retourne un objet, pas du texte brut
             return new SepaResponse(id, "ERROR");
         }
         return doc;
     }
 
     /**
-     * Récupère le détail complet d'une transaction au format HTML via XSLT.
+     * Récupère le détail complet d'une transaction au format HTML.
+     * En cas de succès, renvoie le résultat de la transformation XSLT.
+     * En cas d'erreur, renvoie vers une page d'erreur Thymeleaf.
      */
     @GetMapping(value = "/html/{id}", produces = MediaType.TEXT_HTML_VALUE)
-    @ResponseBody
-    public String getHtmlDetail(@PathVariable long id) {
+    public Object getHtmlDetail(@PathVariable long id, Model model) {
         Document doc = sepaService.getById(id);
         if (doc == null) {
-            return "<html><body><h1>ERROR</h1><p>Identifiant " + id + " incorrect</p></body></html>";
+            model.addAttribute("id", id);
+            model.addAttribute("status", "ERROR");
+            return "error_sepa"; // Utilise le template templates/error_sepa.html
         }
-        return sepaService.transformToHtml(doc);
+        // Retourne directement le contenu HTML généré par XSLT
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_HTML)
+                .body(sepaService.transformToHtml(doc));
     }
 }

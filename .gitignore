@@ -6,6 +6,8 @@ target/
 *.class
 
 .DS_Store
+.metals
+.vscode
 
 # Env files
 .env

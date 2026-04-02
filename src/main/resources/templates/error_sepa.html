@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Erreur - SEPA26</title>
+    <link rel="stylesheet" th:href="@{/sepa26.css}">
+</head>
+<body>
+    <header>
+        <h1>Erreur de transaction</h1>
+    </header>
+    
+    <main>
+        <div class="error-container" style="border: 2px solid red; padding: 20px; margin: 20px; background-color: #fff0f0;">
+            <h2>Détails de l'erreur</h2>
+            <ul>
+                <li><strong>ID demandé :</strong> <span th:text="${id}">0</span></li>
+                <li><strong>Statut :</strong> <span th:text="${status}">ERROR</span></li>
+            </ul>
+            <p>L'identifiant fourni ne correspond à aucune transaction en base.</p>
+        </div>
+        <p><a th:href="@{/sepa26/resume/html}">Retour à la liste</a></p>
+    </main>
+    
+    <footer>
+        <p>&copy; 2026 Université de Rouen Normandie</p>
+    </footer>
+</body>
+</html>

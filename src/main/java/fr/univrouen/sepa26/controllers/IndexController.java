@@ -11,7 +11,7 @@ public class IndexController {
 	public String index(Model model) {
 		model.addAttribute("projectName", "Projet SEPA26");
 		model.addAttribute("version", "0.0.1-SNAPSHOT");
-		model.addAttribute("developer", "Florian");
+		model.addAttribute("developer", "Prénom + Nom et Florian Pépin");
 		return "index";
 	}
 
