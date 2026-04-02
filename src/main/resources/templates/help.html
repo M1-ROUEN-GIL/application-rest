@@ -35,28 +35,40 @@
                     <td>HTML</td>
                 </tr>
                 <tr>
-                    <td><code>/resume</code></td>
+                    <td><code>/sepa26/resume/xml</code></td>
                     <td>GET</td>
-                    <td>Affiche la liste des flux SEPA enregistrés</td>
-                    <td>XML / Texte</td>
-                </tr>
-                <tr>
-                    <td><code>/guid?guid=...</code></td>
-                    <td>GET</td>
-                    <td>Affiche le détail d'une transaction SEPA via son identifiant</td>
-                    <td>XML / Texte</td>
-                </tr>
-                <tr>
-                    <td><code>/xml</code></td>
-                    <td>GET</td>
-                    <td>Affiche un exemple de document SEPA au format XML</td>
+                    <td>Affiche la liste simplifiée des 10 dernières transactions</td>
                     <td>XML</td>
                 </tr>
                 <tr>
-                    <td><code>/testpost</code></td>
+                    <td><code>/sepa26/resume/html</code></td>
+                    <td>GET</td>
+                    <td>Affiche la liste simplifiée des 10 dernières transactions</td>
+                    <td>HTML</td>
+                </tr>
+                <tr>
+                    <td><code>/sepa26/xml/{id}</code></td>
+                    <td>GET</td>
+                    <td>Affiche le contenu complet de la transaction {id}</td>
+                    <td>XML</td>
+                </tr>
+                <tr>
+                    <td><code>/sepa26/html/{id}</code></td>
+                    <td>GET</td>
+                    <td>Affiche le contenu complet de la transaction {id}</td>
+                    <td>HTML</td>
+                </tr>
+                <tr>
+                    <td><code>/sepa26/insert</code></td>
                     <td>POST</td>
-                    <td>Envoie un document XML pour test et le renvoie</td>
-                    <td>Consomme XML, Produit XML</td>
+                    <td>Ajoute un flux SEPA (valide XSD)</td>
+                    <td>XML (SepaResponse)</td>
+                </tr>
+                <tr>
+                    <td><code>/sepa26/delete/{id}</code></td>
+                    <td>DELETE</td>
+                    <td>Supprime la transaction {id}</td>
+                    <td>XML (SepaResponse)</td>
                 </tr>
             </tbody>
         </table>

@@ -145,6 +145,9 @@ services:
 \subsection{Persistance des Données (JPA/Hibernate)}
 La persistance est assurée par \textbf{Spring Data JPA}. Le modèle de données \texttt{Document} a été annoté pour correspondre à la structure de la base de données, permettant un mapping automatique entre les objets Java et les tables SQL.
 
+\subsection{Stratégie de Test}
+Pour garantir la stabilité du code sans polluer la base de données de production, une base de données \textbf{H2 en mémoire} est utilisée lors de l'exécution des tests. Cette configuration est définie dans le profil \texttt{test} (\texttt{application-test.properties}), permettant des tests rapides, isolés et reproductibles à chaque construction du projet.
+
 \section{Service REST}
 Le service expose plusieurs points d'entrée (endpoints) pour la gestion des flux SEPA.
 
