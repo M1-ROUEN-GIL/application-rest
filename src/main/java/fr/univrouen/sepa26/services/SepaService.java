@@ -58,13 +58,18 @@ public class SepaService {
      * @return Le document sauvegardé avec son ID généré, ou null si un doublon de PmtId est détecté.
      */
     public Document save(Document doc) {
-        if (!doc.getDrctDbtTxInfs().isEmpty()) {
-            String pmtId = doc.getDrctDbtTxInfs().get(0).getPmtId();
-            if (pmtId != null && exists(pmtId)) {
-                return null;
-            }
+        try {
+        	for (Document.DrctDbtTxInf tx : doc.getDrctDbtTxInfs()) {
+        		String pmtId = tx.getPmtId();
+        		if (pmtId != null && exists(pmtId)) {
+                    return null;
+                }
+        	}
+        	return repository.save(doc);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	return null;
         }
-        return repository.save(doc);
     }
 
     /**
