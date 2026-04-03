@@ -1,63 +1,84 @@
 package fr.univrouen.sepa26.controllers;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 
-import fr.univrouen.sepa26.model.DrctDbtTxInf;
-import fr.univrouen.sepa26.model.Sepa26;
-import fr.univrouen.sepa26.service.SepaService;
+import fr.univrouen.sepa26.model.Document;
+import fr.univrouen.sepa26.dto.DocumentList;
+import fr.univrouen.sepa26.dto.SepaResponse;
+import fr.univrouen.sepa26.services.SepaService;
 
-@RestController
+/**
+ * Contrôleur gérant les requêtes de consultation (GET).
+ * Fournit des données au format HTML (via Thymeleaf) ou XML (via JAXB).
+ */
+@Controller
+@RequestMapping("/sepa26")
 public class GetController {
-	@Autowired
-	private SepaService service;
-	
-	@GetMapping(value = "/resume", produces = MediaType.APPLICATION_XML_VALUE)
-	public String getResume() {
-		List<DrctDbtTxInf> txs = service.getAll();
-		if (txs.isEmpty()) {
-			return "<transactions><message>Aucune transaction enregistrée</message></transactions>";
-		}
-		StringBuilder sb = new StringBuilder("<transactions>");
-		for (DrctDbtTxInf tx : txs) {
-			sb.append("<transaction>")
-				.append("<PmtId>")
-				.append(tx.getPmtId())
-				.append("</PmtId>")
-				.append("<InstdAmt>")
-				.append(tx.getInstdAmt())
-				.append("</InstdAmt>")
-				.append("</transaction>");
-		}
-		sb.append("</transactions>");
-		return sb.toString();
-	}
-	
-	@GetMapping(value = "/guid", produces = MediaType.APPLICATION_XML_VALUE)
-	public String getByGuid(@RequestParam(value = "guid") String guid) {
-		DrctDbtTxInf tx = service.getByPmtId(guid);
-		if (tx == null) {
-			return "<result><status>ERROR</status>" +
-						"<message>Transaction non trouvée : " + guid + "</message></result>";
-		}
-		return "<DrctDbtTxInf>" +
-			"<PmtId>" + tx.getPmtId() + "</PmtId>" +
-			"<InstdAmt>" + tx.getInstdAmt() + "</InstdAmt>" +
-			"<RmtInf>" + tx.getRmtInf() + "</RmtInf>" +
-			"</DrctDbtTxInf>"
-		;
-	}
-	
-	@RequestMapping(value = "/xml", produces = MediaType.APPLICATION_XML_VALUE)
-	public @ResponseBody Sepa26 getXML() {
-		Sepa26 sepa = new Sepa26("123", "Test model", "2026-17-03T08:01:02");
-		return sepa;
-	}
+
+    @Autowired
+    private SepaService sepaService;
+
+    /**
+     * Retourne la liste des 10 derniers documents au format XML.
+     * @return Un objet DocumentList sérialisé en XML.
+     */
+    @GetMapping(value = "/resume/xml", produces = MediaType.APPLICATION_XML_VALUE)
+    @ResponseBody
+    public DocumentList getResumeXml() {
+        return new DocumentList(sepaService.getLast10());
+    }
+
+    /**
+     * Affiche la liste des 10 derniers documents au format HTML.
+     * @param model Le modèle Spring UI.
+     * @return Le nom de la vue "summary".
+     */
+    @GetMapping(value = "/resume/html", produces = MediaType.TEXT_HTML_VALUE)
+    public String getResumeHtml(Model model) {
+        model.addAttribute("documents", sepaService.getLast10());
+        return "summary";
+    }
+
+    /**
+     * Retourne le détail d'un document au format XML.
+     * @param id L'identifiant technique du document.
+     * @return Le document en XML ou une réponse d'erreur.
+     */
+    @GetMapping(value = "/xml/{id}", produces = MediaType.APPLICATION_XML_VALUE)
+    @ResponseBody
+    public Object getXmlDetail(@PathVariable long id) {
+        Optional<Document> doc = sepaService.getById(id);
+        if (doc.isPresent()) {
+            return doc.get();
+        }
+        return new SepaResponse(id, "ERROR");
+    }
+
+    /**
+     * Affiche le détail d'un document sur une page HTML.
+     * @param id L'identifiant technique du document.
+     * @param model Le modèle Spring UI.
+     * @return La vue "summary" ou "error_sepa".
+     */
+    @GetMapping(value = "/html/{id}", produces = MediaType.TEXT_HTML_VALUE)
+    public String getHtmlDetail(@PathVariable long id, Model model) {
+        Optional<Document> doc = sepaService.getById(id);
+        if (doc.isPresent()) {
+            // summary.html attend une liste nommée "documents"
+            model.addAttribute("documents", List.of(doc.get()));
+            return "summary";
+        }
+        model.addAttribute("id", id);
+        return "error_sepa";
+    }
 }

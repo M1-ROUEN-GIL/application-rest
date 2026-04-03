@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Résumé des transactions</title>
+    <link rel="stylesheet" th:href="@{/sepa26.css}">
+</head>
+<body>
+    <header>
+        <h1>Liste des 10 dernières transactions</h1>
+        <p><a th:href="@{/}">Retour à l'accueil</a></p>
+    </header>
+    
+    <main>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Identifiant</th>
+                    <th>Montant</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="doc : ${documents}">
+                    <td th:text="${doc.creDtTm}">2026-01-01</td>
+                    <td>
+                        <a th:href="@{/sepa26/html/{id}(id=${doc.id})}" 
+                           th:text="${doc.drctDbtTxInfs[0].pmtId}">ID</a>
+                    </td>
+                    <td th:text="${doc.ctrlSum}">0.00</td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+    
+    <footer>
+        <p>&copy; 2026 Université de Rouen Normandie</p>
+    </footer>
+</body>
+</html>

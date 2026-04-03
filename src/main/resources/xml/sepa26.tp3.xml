@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<<<<<<< HEAD
-<DrctDbtTxInf>
-<PmtId>REF OPE A123B</PmtId>
-<InstdAmt Ccy="EUR">1100.07</InstdAmt>
-</DrctDbtTxInf>
-=======
 <p:Document xmlns:p="http://univ.fr/sepa26"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="http://univ.fr/sepa26 sepa26.tp1.xsd">
+
   <p:DrctDbtTxInf>
     <p:PmtId>REF OPE test</p:PmtId>
     <p:InstdAmt Ccy="EUR">1100.07</p:InstdAmt>
@@ -32,5 +27,29 @@
     </p:DbtrAcct>
     <p:RmtInf>Facture N1</p:RmtInf>
   </p:DrctDbtTxInf>
-</p:Document>
->>>>>>> 7c566cf3ce0894b3958b9bb8dcc212f3264b57d0
+
+  <p:DrctDbtTxInf>
+    <p:PmtId>REF OPE BBBB</p:PmtId>
+    <p:InstdAmt Ccy="EUR">2150.08</p:InstdAmt>
+    <p:DrctDbtTx>
+      <p:MndtRltdInf>
+        <p:MndtId>MANDAT NO 666666</p:MndtId>
+        <p:DtOfSgntr>1989-07-03</p:DtOfSgntr>
+      </p:MndtRltdInf>
+    </p:DrctDbtTx>
+    <p:DbtrAgt>
+      <p:FinInstnId>
+        <p:BIC>BANKGBALABC</p:BIC>
+      </p:FinInstnId>
+    </p:DbtrAgt>
+    <p:Dbtr>
+      <p:Nm>Mr Debiteur N2</p:Nm>
+    </p:Dbtr>
+    <p:DbtrAcct>
+      <p:Id>
+        <p:IBAN>GB29NWBK60161331926819</p:IBAN>
+      </p:Id>
+    </p:DbtrAcct>
+    <p:RmtInf>Facture reference ISO 654321</p:RmtInf>
+  </p:DrctDbtTxInf>
+  </p:Document>

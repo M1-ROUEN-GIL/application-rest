@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://univ.fr/sepa26"
+    xmlns="http://univ.fr/sepa26"
+    elementFormDefault="qualified">
+
+    <xs:simpleType name="Max35Text">
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="35"/>
+            <xs:pattern value="([a-zA-Z0-9\-?:().,'+ ]+(/[a-zA-Z0-9\-?:().,'+ ]+)*)"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="AmountType">
+        <xs:restriction base="xs:decimal">
+            <xs:totalDigits value="18"/>
+            <xs:fractionDigits value="2"/>
+            <xs:pattern value="[0-9]{1,15}(\.[0-9]{1,2})?"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="IBANType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[A-Z]{2}[0-9]{2}[a-zA-Z0-9]{1,30}"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="BICType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="PmtId" type="Max35Text"/>
+
+    <xs:element name="InstdAmt">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="AmountType">
+                    <xs:attribute name="Ccy" type="xs:string" use="required" fixed="EUR"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="DrctDbtTx">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="MndtRltdInf">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="MndtId" type="Max35Text"/>
+                            <xs:element name="DtOfSgntr" type="xs:date"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="DbtrAgt">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="FinInstnId">
+                    <xs:complexType>
+                        <xs:choice>
+                            <xs:element name="BIC" type="BICType"/>
+                            <xs:element name="Id" type="Max35Text"/>
+                        </xs:choice>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="Dbtr">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Nm" type="Max35Text"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="DbtrAcct">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Id">
+                    <xs:complexType>
+                        <xs:choice>
+                            <xs:element name="IBAN" type="IBANType"/>
+                            <xs:element name="PrvtId" type="Max35Text"/>
+                        </xs:choice>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="RmtInf" type="xs:string"/>
+
+    <xs:element name="DrctDbtTxInf">
+        <xs:complexType>
+            <xs:all>
+                <xs:element ref="PmtId"/>
+                <xs:element ref="InstdAmt"/>
+                <xs:element ref="DrctDbtTx"/>
+                <xs:element ref="DbtrAgt"/>
+                <xs:element ref="Dbtr"/>
+                <xs:element ref="DbtrAcct"/>
+                <xs:element ref="RmtInf" minOccurs="0" maxOccurs="1"/>
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="Document">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="DrctDbtTxInf" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

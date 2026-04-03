@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
@@ -31,3 +32,52 @@ build/
 
 ### VS Code ###
 .vscode/
+=======
+.settings/
+.project
+.classpath
+
+target/
+*.class
+
+.DS_Store
+.metals
+.vscode
+
+# Env files
+.env
+
+# LaTeX
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+*.blg
+*.bbl
+*.lof
+*.lot
+*.nav
+*.snm
+*.vrb
+*.dvi
+*.ps
+*.gz
+*.pdfsync
+*.alg
+*.acn
+*.acr
+*.glg
+*.glo
+*.gls
+*.ist
+*.maf
+*.mtc
+*.mtc0
+*.pyg
+*.bcf
+*.run.xml
+*.synctex(busy)
+>>>>>>> 7c566cf3ce0894b3958b9bb8dcc212f3264b57d0

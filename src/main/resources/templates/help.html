@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Aide - Projet SEPA26</title>
+    <link rel="stylesheet" th:href="@{/sepa26.css}">
+</head>
+<body>
+    <header>
+        <h1>Aide du service REST SEPA26</h1>
+        <p><a th:href="@{/}">Retour à l'accueil</a></p>
+    </header>
+    
+    <main>
+        <table>
+            <thead>
+                <tr>
+                    <th>URL</th>
+                    <th>Méthode</th>
+                    <th>Opération</th>
+                    <th>Retour / Formats</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>/</code></td>
+                    <td>GET</td>
+                    <td>Affiche la page d'accueil du projet</td>
+                    <td>HTML</td>
+                </tr>
+                <tr>
+                    <td><code>/help</code></td>
+                    <td>GET</td>
+                    <td>Affiche cette page d'aide</td>
+                    <td>HTML</td>
+                </tr>
+                <tr>
+                    <td><code>/sepa26/resume/xml</code></td>
+                    <td>GET</td>
+                    <td>Affiche la liste simplifiée des 10 dernières transactions</td>
+                    <td>XML</td>
+                </tr>
+                <tr>
+                    <td><code>/sepa26/resume/html</code></td>
+                    <td>GET</td>
+                    <td>Affiche la liste simplifiée des 10 dernières transactions</td>
+                    <td>HTML</td>
+                </tr>
+                <tr>
+                    <td><code>/sepa26/xml/{id}</code></td>
+                    <td>GET</td>
+                    <td>Affiche le contenu complet de la transaction {id}</td>
+                    <td>XML</td>
+                </tr>
+                <tr>
+                    <td><code>/sepa26/html/{id}</code></td>
+                    <td>GET</td>
+                    <td>Affiche le contenu complet de la transaction {id}</td>
+                    <td>HTML</td>
+                </tr>
+                <tr>
+                    <td><code>/sepa26/insert</code></td>
+                    <td>POST</td>
+                    <td>Ajoute un flux SEPA (valide XSD)</td>
+                    <td>XML (SepaResponse)</td>
+                </tr>
+                <tr>
+                    <td><code>/sepa26/delete/{id}</code></td>
+                    <td>DELETE</td>
+                    <td>Supprime la transaction {id}</td>
+                    <td>XML (SepaResponse)</td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+    
+    <footer>
+        <p>&copy; 2026 Université de Rouen Normandie</p>
+    </footer>
+</body>
+</html>

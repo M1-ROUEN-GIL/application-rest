@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<p:DrctDbtTxInf xmlns:p="http://univ.fr/sepa26" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://univ.fr/sepa26 sepa26.tp1.xsd ">
+  <p:PmtId>p:PmtId</p:PmtId>
+  <p:InstdAmt Ccy="EUR">0.0</p:InstdAmt>
+  <p:DrctDbtTx>
+    <p:MndtRltdInf>
+      <p:MndtId>p:MndtId</p:MndtId>
+      <p:DtOfSgntr>2001-01-01</p:DtOfSgntr>
+    </p:MndtRltdInf>
+  </p:DrctDbtTx>
+  <p:DbtrAgt>
+    <p:FinInstnId>
+      <p:BIC>BNPAFRPPXXX</p:BIC>
+    </p:FinInstnId>
+  </p:DbtrAgt>
+  <p:Dbtr>
+    <p:Nm>p:Nm</p:Nm>
+  </p:Dbtr>
+  <p:DbtrAcct>
+    <p:Id>
+      <p:IBAN>BC9873DECKEO</p:IBAN>
+    </p:Id>
+  </p:DbtrAcct>
+</p:DrctDbtTxInf>
