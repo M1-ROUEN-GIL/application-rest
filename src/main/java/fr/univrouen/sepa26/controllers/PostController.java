@@ -34,13 +34,13 @@ public class PostController {
     public SepaResponse insert(@RequestBody Document doc) {
         // 1. Validation XSD
         if (!sepaService.validateXSD(doc)) {
-            return new SepaResponse("ERROR: XML non conforme au XSD.");
+            return new SepaResponse("ERROR");
         }
 
         // 2. Sauvegarde (la vérification métier PmtId est faite dans le service)
         Document saved = sepaService.save(doc);
         if (saved == null) {
-            return new SepaResponse("ERROR: PmtId déjà existant.");
+            return new SepaResponse("ERROR");
         }
         return new SepaResponse(saved.getId(), "INSERTED");
     }
@@ -55,7 +55,7 @@ public class PostController {
         if (sepaService.delete(id)) {
             return new SepaResponse(id, "DELETED");
         } else {
-            return new SepaResponse("ERROR: Document inexistant.");
+            return new SepaResponse("ERROR");
         }
     }
 }
