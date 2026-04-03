@@ -1,10 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<<<<<<< HEAD
-<DrctDbtTxInf>
-<PmtId>REF OPE A123B</PmtId>
-<InstdAmt Ccy="EUR">1100.07</InstdAmt>
-</DrctDbtTxInf>
-=======
 <p:Document xmlns:p="http://univ.fr/sepa26"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="http://univ.fr/sepa26 sepa26.tp1.xsd">
@@ -33,4 +27,3 @@
     <p:RmtInf>Facture N1</p:RmtInf>
   </p:DrctDbtTxInf>
 </p:Document>
->>>>>>> 7c566cf3ce0894b3958b9bb8dcc212f3264b57d0
