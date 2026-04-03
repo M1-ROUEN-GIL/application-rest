@@ -20,7 +20,8 @@ public class IndexController {
 	public String index(Model model) {
 		model.addAttribute("projectName", "Projet SEPA26");
 		model.addAttribute("version", "0.0.1-SNAPSHOT");
-		model.addAttribute("developer", "Florian Pépin");
+		model.addAttribute("developer", "Florian Pépin & Umm-Habibah Ouattara");
+		model.addAttribute("universityLogo", "https://www.choisirlanormandie.fr/app/uploads/2024/08/logo-universite-de-rouen.png");
 		return "index";
 	}
 

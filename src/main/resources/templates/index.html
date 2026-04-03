@@ -7,7 +7,7 @@
 </head>
 <body>
     <header>
-        <img src="https://www.univ-rouen.fr/wp-content/themes/univ-rouen/assets/img/logo-universite-rouen-normandie.svg" alt="Logo Université de Rouen" width="250">
+        <img th:src="${universityLogo}" alt="Logo Université de Rouen" width="250">
         <h1>Bienvenue sur le service REST SEPA26</h1>
     </header>
     
@@ -17,7 +17,7 @@
             <ul>
                 <li><strong>Nom du projet :</strong> <span th:text="${projectName}">SEPA26</span></li>
                 <li><strong>Version :</strong> <span th:text="${version}">0.0.1</span></li>
-                <li><strong>Développeur :</strong> <span th:text="${developer}">Étudiant</span></li>
+                <li><strong>Développeurs :</strong> <span th:text="${developer}">Étudiant</span></li>
             </ul>
         </section>
         
@@ -27,6 +27,7 @@
                 <li><a th:href="@{/help}">Page d'aide</a></li>
                 <li><a th:href="@{/sepa26/resume/html}">Résumé des flux (HTML)</a></li>
                 <li><a th:href="@{/sepa26/resume/xml}">Résumé des flux (XML)</a></li>
+                <li><a th:href="@{/transfert}">Transfert</a></li>
             </ul>
         </nav>
     </main>
