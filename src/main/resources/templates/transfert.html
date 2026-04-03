@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Importer un flux XML</title>
+    <link rel="stylesheet" th:href="@{/sepa26.css}">
+</head>
+<body>
+    <header>
+        <h1>Application de transfert SEPA</h1>
+        <p><a th:href="@{/}">Retour à l'accueil</a></p>
+    </header>
+    
+    <main>
+    	<form id="transferForm">
+            <div class="form-group">
+                <label for="serverUrl">URL du serveur:</label>
+                <input type="text" id="serverUrl" value="http://localhost" required>
+            </div>
+
+            <div class="form-group">
+                <label for="serverPort">Port:</label>
+                <input type="number" id="serverPort" value="8080" min="1" max="65535" required>
+            </div>
+
+            <div class="form-group">
+                <label for="endpoint">Endpoint:</label>
+                <input type="text" id="endpoint" value="/rss25SB/insert" required>
+            </div>
+
+            <div class="form-group">
+                <label for="xmlFile">Fichier XML:</label>
+                <input type="file" id="xmlFile" accept=".xml" required>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="validateXml">
+                <label for="validateXml">Valider le XML avant le transfert</label>
+            </div>
+
+            <button type="submit" class="btn">Transférer</button>
+            <button type="button" class="btn btn-secondary" id="resetBtn">Réinitialiser</button>
+        </form>
+
+        <div id="response" class="response">
+            <h3 id="responseTitle">Résultat</h3>
+            <p id="responseMessage"></p>
+            <pre id="responseDetails"></pre>
+        </div>
+    </main>
+    	
+    <footer>
+        <p>&copy; 2026 Université de Rouen Normandie</p>
+    </footer>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('transferForm');
+        const resetBtn = document.getElementById('resetBtn');
+        const serverUrl = document.getElementById('serverUrl');
+        const serverPort = document.getElementById('serverPort');
+        const endpoint = document.getElementById('endpoint');
+        const xmlFile = document.getElementById('xmlFile');
+        const validateXml = document.getElementById('validateXml');
+        const response = document.getElementById('response');
+        const responseTitle = document.getElementById('responseTitle');
+        const responseMessage = document.getElementById('responseMessage');
+        const responseDetails = document.getElementById('responseDetails');
+
+        // Check if we have XML from the conversion application
+        const urlParams = new URLSearchParams(window.location.search);
+        const fromConvert = urlParams.get('fromConvert') === 'true';
+        let convertedXml = null;
+
+        if (fromConvert) {
+            convertedXml = sessionStorage.getItem('convertedXml');
+            if (convertedXml) {
+                // Show a message that we're using converted XML
+                showInfo('XML Converti', 'Utilisation du XML converti depuis l\'application de conversion. Vous pouvez maintenant le transférer vers le serveur.');
+
+                // Make the file input optional since we have XML from conversion
+                xmlFile.removeAttribute('required');
+            }
+        }
+
+        // Helper function to process and send XML
+        function processAndSendXml(xml) {
+            // Validate XML if option is checked
+            if (validateXml.checked) {
+                // Client-side validation using DOMParser
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xml, 'text/xml');
+
+                // Check for parsing errors
+                const parserError = xmlDoc.getElementsByTagName('parsererror');
+                if (parserError.length > 0) {
+                    showError('Erreur de validation XML', 'Le fichier XML contient des erreurs de syntaxe.', parserError[0].textContent);
+                    return;
+                }
+            }
+
+            // Construct the full URL
+            const url = `${serverUrl.value}:${serverPort.value}${endpoint.value}`;
+
+            // Send XML to server
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/xml'
+                },
+                body: xml
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`Erreur HTTP: ${res.status}`);
+                }
+                return res.text();
+            })
+            .then(data => {
+                // Parse XML response
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(data, 'text/xml');
+
+                const status = xmlDoc.getElementsByTagName('status')[0]?.textContent;
+
+                if (status === 'INSERTED') {
+                    const id = xmlDoc.getElementsByTagName('id')[0]?.textContent;
+                    showSuccess('Succès', `Le flux a été transféré avec succès.`, `ID de l'article: ${id}\n\nRéponse complète:\n${data}`);
+                } else {
+                    const message = xmlDoc.getElementsByTagName('message')[0]?.textContent || 'Une erreur est survenue.';
+                    showError('Erreur', message, `Réponse complète:\n${data}`);
+                }
+            })
+            .catch(err => {
+                showError('Erreur de communication', 'Une erreur est survenue lors de la communication avec le serveur.', err.toString());
+            });
+        }
+
+        // Handle form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // If we have converted XML, use it
+            if (convertedXml) {
+                processAndSendXml(convertedXml);
+                return;
+            }
+
+            // Otherwise, use the file input
+            if (!xmlFile.files || xmlFile.files.length === 0) {
+                showError('Erreur', 'Veuillez sélectionner un fichier XML.');
+                return;
+            }
+
+            const file = xmlFile.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const xml = e.target.result;
+                processAndSendXml(xml);
+            };
+
+            reader.onerror = function() {
+                showError('Erreur de lecture', 'Impossible de lire le fichier XML.');
+            };
+
+            reader.readAsText(file);
+        });
+
+        // Reset form
+        resetBtn.addEventListener('click', function() {
+            form.reset();
+            response.style.display = 'none';
+        });
+
+        // Helper functions
+        function showSuccess(title, message, details = '') {
+            responseTitle.textContent = title;
+            responseMessage.textContent = message;
+            responseDetails.textContent = details;
+            response.className = 'response success';
+            response.style.display = 'block';
+        }
+
+        function showError(title, message, details = '') {
+            responseTitle.textContent = title;
+            responseMessage.textContent = message;
+            responseDetails.textContent = details;
+            response.className = 'response error';
+            response.style.display = 'block';
+        }
+
+        function showInfo(title, message, details = '') {
+            responseTitle.textContent = title;
+            responseMessage.textContent = message;
+            responseDetails.textContent = details;
+            response.className = 'response';
+            response.style.display = 'block';
+        }
+    });
+</script>
+    
+</body>
+</html>
