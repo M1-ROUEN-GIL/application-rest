@@ -3,8 +3,10 @@ package fr.univrouen.sepa26.services;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Optional;
+import java.io.StringReader;
 
 import javax.xml.XMLConstants;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
@@ -34,7 +36,7 @@ public class SepaService {
      * @param doc Le document à valider.
      * @return true si le document est valide, false sinon.
      */
-    public boolean validateXSD(Document doc) {
+    /*public boolean validateXSD(Document doc) {
         try {
             JAXBContext jc = JAXBContext.newInstance(Document.class);
             JAXBSource source = new JAXBSource(jc, doc);
@@ -46,7 +48,25 @@ public class SepaService {
             validator.validate(source);
             return true;
         } catch (Exception e) {
-            System.err.println("Erreur de validation XSD : " + e.getMessage());
+            //System.err.println("Erreur de validation XSD : " + e.getMessage());
+        	e.printStackTrace();
+            return false;
+        }
+    }*/
+    public boolean validateXSD(Document doc) {
+        try {
+            String xml = convertToXml(doc);
+
+            SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            Schema schema = sf.newSchema(new ClassPathResource("xml/sepa26.tp1.xsd").getURL());
+
+            Validator validator = schema.newValidator();
+            validator.validate(new StreamSource(new StringReader(xml)));
+
+            return true;
+        } catch (Exception e) {
+            //e.printStackTrace();
+        	System.out.println("Erreur de validation XSD : " + e.getMessage());
             return false;
         }
     }
@@ -59,16 +79,22 @@ public class SepaService {
      */
     public Document save(Document doc) {
         try {
-        	for (Document.DrctDbtTxInf tx : doc.getDrctDbtTxInfs()) {
-        		String pmtId = tx.getPmtId();
-        		if (pmtId != null && exists(pmtId)) {
-                    return null;
+            if (doc.getCstmrDrctDbtInitn() == null) {
+                return null;
+            }
+            for (Document.PmtInf pmt : doc.getCstmrDrctDbtInitn().getPmtInfs()) {
+                if (pmt.getDrctDbtTxInfs() == null) continue;
+                for (Document.DrctDbtTxInf tx : pmt.getDrctDbtTxInfs()) {
+                    String pmtId = tx.getPmtId();
+                    if (pmtId != null && exists(pmtId)) {
+                        return null;
+                    }
                 }
-        	}
-        	return repository.save(doc);
+            }
+            return repository.save(doc);
         } catch (Exception e) {
-        	e.printStackTrace();
-        	return null;
+            e.printStackTrace();
+            return null;
         }
     }
 

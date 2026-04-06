@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -29,59 +31,95 @@ public class SepaServiceTest {
     @InjectMocks
     private SepaService sepaService;
 
-    private Document validDoc;
-
+    private Document validDoc;    
+    
     @BeforeEach
     void setUp() {
         validDoc = new Document();
-        // NOTE: creDtTm and ctrlSum are for our DB/Internal use but NOT allowed in the pure XSD Document element
-        // The XSD expects a sequence of DrctDbtTxInf only.
 
-        Document.DrctDbtTxInf inf = new Document.DrctDbtTxInf();
-        inf.setPmtId("REF-UNIT-TEST");
+        Document.CstmrDrctDbtInitn initn = new Document.CstmrDrctDbtInitn();
+        validDoc.setCstmrDrctDbtInitn(initn);
+
+        Document.GrpHdr grpHdr = new Document.GrpHdr();
+        grpHdr.setMsgId("MSG-UNIT-TEST");
+        grpHdr.setCreDtTm(LocalDateTime.parse("2026-03-01T10:00:00"));
+        grpHdr.setNbOfTxs(1);
+        grpHdr.setCtrlSum(100.0);
+        Document.Party initgPty = new Document.Party();
+        initgPty.setNm("Test Company");
+        grpHdr.setInitgPty(initgPty);
+        initn.setGrpHdr(grpHdr);
+
+        Document.PmtInf pmtInf = new Document.PmtInf();
+        pmtInf.setPmtInfId("PMT-UNIT-1");
+        pmtInf.setNbOfTxs(1);
+        pmtInf.setCtrlSum(100.0);
+        pmtInf.setReqdColltnDt(LocalDate.parse("2026-03-10"));
+
+        Document.Party cdtr = new Document.Party();
+        cdtr.setNm("Creditor Company");
+        pmtInf.setCdtr(cdtr);
+
+        Document.Account cdtrAcct = new Document.Account();
+        Document.AccountId cdtrAcctId = new Document.AccountId();
+        cdtrAcctId.setIban("FR7612345678901234567890123");
+        cdtrAcct.setId(cdtrAcctId);
+        pmtInf.setCdtrAcct(cdtrAcct);
+
+        Document.Agent cdtrAgt = new Document.Agent();
+        Document.FinInstnId finCdtr = new Document.FinInstnId();
+        finCdtr.setBic("BANKFRPPXXX");
+        cdtrAgt.setFinInstnId(finCdtr);
+        pmtInf.setCdtrAgt(cdtrAgt);
+
+        Document.DrctDbtTxInf txInf = new Document.DrctDbtTxInf();
+        txInf.setPmtId("REF-UNIT-TEST");
 
         Document.InstdAmt amt = new Document.InstdAmt();
         amt.setValue(100.0);
         amt.setCcy("EUR");
-        inf.setInstdAmt(amt);
+        txInf.setInstdAmt(amt);
 
         Document.DrctDbtTx tx = new Document.DrctDbtTx();
         Document.MndtRltdInf mndt = new Document.MndtRltdInf();
         mndt.setMndtId("MANDAT-UNIT");
-        mndt.setDtOfSgntr("2026-03-01");
+        mndt.setDtOfSgntr(LocalDate.parse("2026-03-01"));
         tx.setMndtRltdInf(mndt);
-        inf.setDrctDbtTx(tx);
+        txInf.setDrctDbtTx(tx);
 
-        Document.DbtrAgt agt = new Document.DbtrAgt();
-        Document.FinInstnId fin = new Document.FinInstnId();
-        fin.setBic("ROUENSWNXXX");
-        agt.setFinInstnId(fin);
-        inf.setDbtrAgt(agt);
+        Document.Agent dbtrAgt = new Document.Agent();
+        Document.FinInstnId finDbtr = new Document.FinInstnId();
+        finDbtr.setBic("BANKDEFFXXX");
+        dbtrAgt.setFinInstnId(finDbtr);
+        txInf.setDbtrAgt(dbtrAgt);
 
-        Document.Dbtr dbtr = new Document.Dbtr();
+        Document.Party dbtr = new Document.Party();
         dbtr.setNm("Client Unitaire");
-        inf.setDbtr(dbtr);
+        txInf.setDbtr(dbtr);
 
-        Document.DbtrAcct acct = new Document.DbtrAcct();
-        Document.DbtrAcctId acctId = new Document.DbtrAcctId();
+        Document.Account acct = new Document.Account();
+        Document.AccountId acctId = new Document.AccountId();
         acctId.setIban("FR7612345678901234567890123");
         acct.setId(acctId);
-        inf.setDbtrAcct(acct);
+        txInf.setDbtrAcct(acct);
 
-        validDoc.getDrctDbtTxInfs().add(inf);
+        pmtInf.getDrctDbtTxInfs().add(txInf);
+
+        initn.getPmtInfs().add(pmtInf);
     }
-
+    
     @Test
     void testValidateXSD_Success() {
         assertTrue(sepaService.validateXSD(validDoc), "Le document devrait être valide selon le XSD");
     }
-
+    
     @Test
     void testValidateXSD_Failure() {
-        Document invalidDoc = new Document(); // Document vide, invalide selon XSD (minOccurs=1 attendu par défaut ou sequence non vide)
-        assertFalse(sepaService.validateXSD(invalidDoc), "Un document vide devrait être invalide");
+        Document invalidDoc = new Document();
+        boolean valid = sepaService.validateXSD(invalidDoc);
+        assertFalse(valid, "Un document vide devrait être invalide");
     }
-
+    
     @Test
     void testSave_Success() {
         when(repository.findByPmtId("REF-UNIT-TEST")).thenReturn(Optional.empty());
@@ -89,17 +127,18 @@ public class SepaServiceTest {
 
         Document saved = sepaService.save(validDoc);
 
-        assertNotNull(saved);
+        assertNotNull(saved, "Le document sauvegardé ne devrait pas être null");
         verify(repository, times(1)).save(validDoc);
     }
-
+    
     @Test
     void testSave_DuplicateError() {
-        when(repository.findByPmtId("REF-UNIT-TEST")).thenReturn(Optional.of(new Document()));
+        when(repository.findByPmtId("REF-UNIT-TEST"))
+            .thenReturn(Optional.of(new Document()));
 
         Document result = sepaService.save(validDoc);
 
-        assertNull(result, "Le service devrait retourner null en cas de doublon de PmtId");
+        assertNull(result, "Le service devrait retourner null en cas de doublon");
         verify(repository, never()).save(any());
     }
 
@@ -122,6 +161,15 @@ public class SepaServiceTest {
         boolean deleted = sepaService.delete(id);
 
         assertFalse(deleted);
-        verify(repository, never()).deleteById(id);
+        verify(repository, never()).deleteById(any());
     }
+    /*
+    @Test
+    void testPrintXml() {
+        String xml = sepaService.convertToXml(validDoc);
+        System.out.println("=== XML généré ===");
+        System.out.println(xml);
+        System.out.println("=================");
+    }
+    */
 }
