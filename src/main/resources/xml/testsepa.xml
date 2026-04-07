@@ -5,16 +5,27 @@
       <p:MsgId>MSGID - 123456</p:MsgId>
       <p:CreDtTm>2001-12-31T12:00:00</p:CreDtTm>
       <p:NbOfTxs>1</p:NbOfTxs>
-      <p:CtrlSum>1110.00</p:CtrlSum>
+      <p:CtrlSum>1110.50</p:CtrlSum>
       <p:InitgPty>
-        <p:Nm>Societe RRR</p:Nm>
+        <p:Nm>Societe XX</p:Nm>
       </p:InitgPty>
     </p:GrpHdr>
     <p:PmtInf>
       <p:PmtInfId>REF Remise 123</p:PmtInfId>
+      <p:NbOfTxs>1</p:NbOfTxs>
+      <p:CtrlSum>1000.50</p:CtrlSum>
+      <p:PmtTpInf>
+        <p:SvcLvl>
+          <p:Cd>SEPA</p:Cd>
+        </p:SvcLvl>
+        <p:LclInstrm>
+          <p:Cd>CORE</p:Cd>
+        </p:LclInstrm>
+        <p:SeqTp>RCUR</p:SeqTp>
+      </p:PmtTpInf>
       <p:ReqdColltnDt>2001-01-01</p:ReqdColltnDt>
       <p:Cdtr>
-        <p:Nm>Societe RRR</p:Nm>
+        <p:Nm>Societe XX</p:Nm>
       </p:Cdtr>
       <p:CdtrAcct>
         <p:Id>
@@ -26,9 +37,21 @@
           <p:BIC>BANKFRPP</p:BIC>
         </p:FinInstnId>
       </p:CdtrAgt>
+      <p:CdtrSchmeId>
+        <p:Id>
+          <p:PrvtId>
+            <p:Othr>
+              <p:Id>FR00ZZZ123456</p:Id>
+              <p:SchmeNm>
+                <p:Prtry>SEPA</p:Prtry>
+              </p:SchmeNm>
+            </p:Othr>
+          </p:PrvtId>
+        </p:Id>
+      </p:CdtrSchmeId>
       <p:DrctDbtTxInf>
         <p:PmtId>REF OPE AAAA</p:PmtId>
-        <p:InstdAmt Ccy="EUR">1100.07</p:InstdAmt>
+        <p:InstdAmt Ccy="EUR">1000.0</p:InstdAmt>
         <p:DrctDbtTx>
           <p:MndtRltdInf>
             <p:MndtId>MANDAT NO 55555</p:MndtId>
@@ -37,17 +60,20 @@
         </p:DrctDbtTx>
         <p:DbtrAgt>
           <p:FinInstnId>
-            <p:BIC>BANKGBUL</p:BIC>
-          </p:FinInstnId>
+			<p:Othr>
+				<p:Id>NOTPROVIDED</p:Id>
+			</p:Othr>
+			</p:FinInstnId>
         </p:DbtrAgt>
         <p:Dbtr>
-          <p:Nm>Debiteur N5</p:Nm>
+          <p:Nm>Mr Debiteur N1</p:Nm>
         </p:Dbtr>
         <p:DbtrAcct>
           <p:Id>
-            <p:IBAN>GB29NWBK60161331926819</p:IBAN>
+            <p:IBAN>FR763004136210001234567811</p:IBAN>
           </p:Id>
         </p:DbtrAcct>
+        <p:RmtInf>Facture N1</p:RmtInf>
       </p:DrctDbtTxInf>
     </p:PmtInf>
   </p:CstmrDrctDbtInitn>

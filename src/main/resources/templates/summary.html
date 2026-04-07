@@ -22,12 +22,12 @@
             </thead>
             <tbody>
                 <tr th:each="doc : ${documents}">
-                    <td th:text="${doc.creDtTm}">2026-01-01</td>
+                    <td th:text="${doc.cstmrDrctDbtInitn.grpHdr.creDtTm}">2026-01-01</td>
                     <td>
                         <a th:href="@{/sepa26/html/{id}(id=${doc.id})}" 
-                           th:text="${doc.drctDbtTxInfs[0].pmtId}">ID</a>
+                           th:text="${doc.cstmrDrctDbtInitn.pmtInfs[0].drctDbtTxInfs[0].pmtId}">ID</a>
                     </td>
-                    <td th:text="${doc.ctrlSum}">0.00</td>
+                    <td th:text="${doc.cstmrDrctDbtInitn.grpHdr.ctrlSum}">0.00</td>
                 </tr>
             </tbody>
         </table>

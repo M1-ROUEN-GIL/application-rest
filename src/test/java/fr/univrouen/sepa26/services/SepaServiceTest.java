@@ -36,7 +36,7 @@ public class SepaServiceTest {
     @BeforeEach
     void setUp() {
         validDoc = new Document();
-
+        
         Document.CstmrDrctDbtInitn initn = new Document.CstmrDrctDbtInitn();
         validDoc.setCstmrDrctDbtInitn(initn);
 
@@ -55,6 +55,17 @@ public class SepaServiceTest {
         pmtInf.setNbOfTxs(1);
         pmtInf.setCtrlSum(100.0);
         pmtInf.setReqdColltnDt(LocalDate.parse("2026-03-10"));
+        
+        Document.PaymentTypeInfo pmtTpInf = new Document.PaymentTypeInfo();
+        Document.ServiceLevel sl = new Document.ServiceLevel();
+        Document.LocalInstrument li = new Document.LocalInstrument();
+        li.setCd("SEPA");
+        sl.setCd("SEPA");
+        pmtTpInf.setLclInstrm(li);
+        pmtTpInf.setSvcLvl(sl);
+        pmtTpInf.setSeqTp("RCUR");
+        pmtInf.setPmtTpInf(pmtTpInf);
+        
 
         Document.Party cdtr = new Document.Party();
         cdtr.setNm("Creditor Company");
@@ -71,6 +82,21 @@ public class SepaServiceTest {
         finCdtr.setBic("BANKFRPPXXX");
         cdtrAgt.setFinInstnId(finCdtr);
         pmtInf.setCdtrAgt(cdtrAgt);
+        
+        
+        Document.AccountSchemeId cdtrSchmeId = new Document.AccountSchemeId();
+        Document.AccountId prvtIdWrapper = new Document.AccountId();
+        Document.PrivateId prvtId = new Document.PrivateId();
+        Document.OtherIdentification othr = new Document.OtherIdentification();
+        othr.setId("FR00ZZZ123456");
+        Document.SchemeName schmeNm = new Document.SchemeName();
+        schmeNm.setPrtry("SEPA");
+        othr.setSchemeName(schmeNm);
+        prvtId.setOthr(othr);
+        prvtIdWrapper.setPrvtId(prvtId);
+        cdtrSchmeId.setId(prvtIdWrapper);
+        pmtInf.setCdtrSchmeId(cdtrSchmeId);
+        
 
         Document.DrctDbtTxInf txInf = new Document.DrctDbtTxInf();
         txInf.setPmtId("REF-UNIT-TEST");
@@ -102,22 +128,39 @@ public class SepaServiceTest {
         acctId.setIban("FR7612345678901234567890123");
         acct.setId(acctId);
         txInf.setDbtrAcct(acct);
-
+        
+        txInf.setRmtInf("Facture Unitaire");
+        
         pmtInf.getDrctDbtTxInfs().add(txInf);
 
         initn.getPmtInfs().add(pmtInf);
     }
-    
+    /*
     @Test
     void testValidateXSD_Success() {
         assertTrue(sepaService.validateXSD(validDoc), "Le document devrait être valide selon le XSD");
     }
-    
+    */
+    @Test
+    void testValidateXSDRaw_Success() {
+        String xml = sepaService.convertToXml(validDoc);
+        assertTrue(sepaService.validateXSDRaw(xml));
+    }
+    /*
     @Test
     void testValidateXSD_Failure() {
         Document invalidDoc = new Document();
+        
+        //System.out.println(sepaService.convertToXml(invalidDoc));
+        
         boolean valid = sepaService.validateXSD(invalidDoc);
         assertFalse(valid, "Un document vide devrait être invalide");
+    }
+    */
+    @Test
+    void testValidateXSDRaw_Failure() {
+        String invalidXml = "<Document xmlns=\"http://univ.fr/sepa26\"></Document>";
+        assertFalse(sepaService.validateXSDRaw(invalidXml));
     }
     
     @Test
@@ -171,5 +214,5 @@ public class SepaServiceTest {
         System.out.println(xml);
         System.out.println("=================");
     }
-    */
+   */
 }
