@@ -19,7 +19,7 @@ import fr.univrouen.sepa26.model.Document;
 import fr.univrouen.sepa26.repository.DocumentRepository;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.util.JAXBSource;
+//import jakarta.xml.bind.util.JAXBSource;
 
 /**
  * Service métier pour la gestion des documents SEPA.
@@ -52,7 +52,7 @@ public class SepaService {
         	e.printStackTrace();
             return false;
         }
-    }*/
+    }
     public boolean validateXSD(Document doc) {
         try {
             String xml = convertToXml(doc);
@@ -70,6 +70,7 @@ public class SepaService {
             return false;
         }
     }
+    */
 
     /**
      * Sauvegarde un document en base de données.
@@ -152,6 +153,47 @@ public class SepaService {
             return sw.toString();
         } catch (Exception e) {
             return "<error>" + e.getMessage() + "</error>";
+        }
+    }
+    
+    /**
+     * Valide le XML brut (String) contre le XSD — évite les problèmes
+     * d'ordre des éléments lors de la re-sérialisation JAXB
+     */
+    public boolean validateXSDRaw(String xmlContent) {
+        try {
+            SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            Schema schema = sf.newSchema(new ClassPathResource("xml/sepa26.tp1.xsd").getURL());
+
+            Validator validator = schema.newValidator();
+
+            javax.xml.parsers.DocumentBuilderFactory factory = javax.xml.parsers.DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+
+            javax.xml.parsers.DocumentBuilder builder = factory.newDocumentBuilder();
+            org.w3c.dom.Document document = builder.parse(new org.xml.sax.InputSource(new StringReader(xmlContent)));
+
+            validator.validate(new javax.xml.transform.dom.DOMSource(document));
+
+            return true;
+
+        } catch (Exception e) {
+            System.err.println("Erreur de validation XSD : " + e.getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Désérialise un XML brut en objet Document via JAXB
+     */
+    public static Document parseXml(String xmlContent) {
+        try {
+            JAXBContext jc = JAXBContext.newInstance(Document.class);
+            return (Document) jc.createUnmarshaller()
+                .unmarshal(new java.io.StringReader(xmlContent));
+        } catch (Exception e) {
+            System.err.println("Erreur de parsing XML : " + e.getMessage());
+            return null;
         }
     }
 }

@@ -20,9 +20,13 @@ import java.util.List;
  * 1. Entité JPA pour la persistance en base de données SQL.
  * 2. Modèle JAXB/Jackson pour la désérialisation XML.
  */
-@XmlRootElement(name = "Document")
-@JacksonXmlRootElement(localName = "Document")
+@XmlRootElement(
+	    name = "Document",
+	    namespace = "http://univ.fr/sepa26"
+	)
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(propOrder = {"cstmrDrctDbtInitn"})
+@JacksonXmlRootElement(localName = "Document")
 @Entity
 @Table(name = "documents")
 public class Document {
@@ -30,20 +34,22 @@ public class Document {
     /** Identifiant unique en base de données */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "document_id")
     @XmlTransient
-    private Long id;
+    private Long idDoc;
     
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "cstmr_direct_debit_initiation_id")
+    @JacksonXmlProperty(localName = "CstmrDrctDbtInitn")
+    @JoinColumn(name = "cstmr_drct_dbt_init_id", referencedColumnName = "cstmr_direct_debit_initiation_id")
     @XmlElement(name = "CstmrDrctDbtInitn")
     private CstmrDrctDbtInitn cstmrDrctDbtInitn;
 
     public Long getId() {
-    	return id;
+    	return idDoc;
     }
     
-    public void setId(Long id) {
-    	this.id = id;
+    public void setId(Long idDoc) {
+    	this.idDoc = idDoc;
     }
     
     public CstmrDrctDbtInitn getCstmrDrctDbtInitn() {
@@ -61,26 +67,28 @@ public class Document {
     public static class CstmrDrctDbtInitn {
     	@Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
+		@Column(name = "cstmr_direct_debit_initiation_id")
         @XmlTransient
-        private Long id;
+        private Long idCstmr;
     	
     	@OneToOne(cascade = CascadeType.ALL)
-    	@JoinColumn(name = "grp_hdr_id")
+    	@JoinColumn(name = "grp_hdr_id", referencedColumnName = "grp_hdr_id")
     	@XmlElement(name = "GrpHdr")
     	private GrpHdr grpHdr;
     	
     	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    	@JoinColumn(name = "cstmr_direct_debit_initiation_id")
+    	@JacksonXmlProperty(localName = "PmtInf")
+    	@JoinColumn(name = "cstmr_direct_debit_initiation_id", referencedColumnName = "cstmr_direct_debit_initiation_id")
     	@XmlElement(name = "PmtInf")
     	@JacksonXmlElementWrapper(useWrapping = false)
     	private List<PmtInf> pmtInfs = new ArrayList<>();
     	
     	public Long getId() {
-        	return id;
+        	return idCstmr;
         }
         
-        public void setId(Long id) {
-        	this.id = id;
+        public void setId(Long idCstmr) {
+        	this.idCstmr = idCstmr;
         }
         
         public GrpHdr getGrpHdr() {
@@ -107,8 +115,9 @@ public class Document {
     public static class GrpHdr {
     	@Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
+		@Column(name = "grp_hdr_id")
         @XmlTransient
-        private Long id;
+        private Long idGrp;
     	
     	@XmlElement(name = "MsgId")
     	private String msgId;
@@ -125,14 +134,17 @@ public class Document {
     	
     	@Embedded
     	@XmlElement(name = "InitgPty")
+		@AttributeOverrides({
+				@AttributeOverride(name = "nm", column = @Column(name = "initgpty_nm"))
+		})
     	private Party initgPty;
     	
     	public Long getId() {
-        	return id;
+        	return idGrp;
         }
         
-        public void setId(Long id) {
-        	this.id = id;
+        public void setId(Long idGrp) {
+        	this.idGrp = idGrp;
         }
         
         public String getMsgId() {
@@ -183,8 +195,9 @@ public class Document {
     public static class PmtInf {
     	@Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
+		@Column(name = "pmtinf_id")
         @XmlTransient
-        private Long id;
+        private Long idPmtInf;
     	
     	@XmlElement(name = "PmtInfId")
     	private String pmtInfId;
@@ -204,32 +217,51 @@ public class Document {
     	
     	@Embedded
     	@XmlElement(name = "Cdtr")
+		@AttributeOverrides({
+				@AttributeOverride(name = "nm", column = @Column(name = "cdtr_nm"))
+		})
     	private Party cdtr;
     	
     	@Embedded
     	@XmlElement(name = "CdtrAcct")
+    	@AttributeOverrides({
+            @AttributeOverride(name = "id.iban", column = @Column(name = "cdtracct_iban")),
+            @AttributeOverride(name = "id.prvtId.othr.id", column = @Column(name = "cdtracct_prvtid")),
+            @AttributeOverride(name = "id.prvtId.othr.schemeName.prtry", column = @Column(name = "cdtracct_prtry"))
+    	})
     	private Account cdtrAcct;
     	
     	@Embedded
     	@XmlElement(name = "CdtrAgt")
+    	@AttributeOverrides({
+            @AttributeOverride(name = "finInstnId.bic", column = @Column(name = "cdtragt_bic")),
+            @AttributeOverride(name = "finInstnId.othr.id", column = @Column(name = "cdtragt_id")),
+            @AttributeOverride(name = "finInstnId.othr.schemeName.prtry", column = @Column(name = "cdtragt_prtry"))
+    	})
     	private Agent cdtrAgt;
     	
     	@Embedded
     	@XmlElement(name = "CdtrSchmeId")
+    	@AttributeOverrides({
+            @AttributeOverride(name = "id.iban", column = @Column(name = "cdtrschmeid_iban")),
+            @AttributeOverride(name = "id.prvtId.othr.id", column = @Column(name = "cdtrschmeid_prvtid")),
+            @AttributeOverride(name = "id.prvtId.othr.schemeName.prtry", column = @Column(name = "cdtrschmeid_prtry"))
+    	})
     	private AccountSchemeId cdtrSchmeId;
     	
     	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    	@JoinColumn(name = "pmtinf_id")
+    	@JacksonXmlProperty(localName = "DrctDbtTxInf")
+    	@JoinColumn(name = "pmtinf_id", referencedColumnName = "pmtinf_id")
     	@XmlElement(name = "DrctDbtTxInf")
     	@JacksonXmlElementWrapper(useWrapping = false)
     	private List<DrctDbtTxInf> drctDbtTxInfs = new ArrayList<>();
     	
     	public Long getId() {
-        	return id;
+        	return idPmtInf;
         }
         
-        public void setId(Long id) {
-        	this.id = id;
+        public void setId(Long idPmtInf) {
+        	this.idPmtInf = idPmtInf;
         }
         
         public String getPmtInfId() {
@@ -320,14 +352,20 @@ public class Document {
 	public static class DrctDbtTxInf {
 		@Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
+		@Column(name = "drct_dbt_tx_inf_id")
         @XmlTransient
-        private Long id;
+        private Long idDrctDbt;
 		
 		@XmlElement(name = "PmtId")
+		@JacksonXmlProperty(localName = "PmtId")
 		private String pmtId;
 		
 		@Embedded
 		@XmlElement(name = "InstdAmt")
+		@AttributeOverrides({
+				@AttributeOverride(name = "value", column = @Column(name = "instdamt_value")),
+				@AttributeOverride(name = "ccy", column = @Column(name = "instdamt_ccy"))
+		})
 		private InstdAmt instdAmt;
 		
 		@Embedded
@@ -336,25 +374,38 @@ public class Document {
 		
 		@Embedded
 		@XmlElement(name = "DbtrAgt")
+		@AttributeOverrides({
+            @AttributeOverride(name = "finInstnId.bic", column = @Column(name = "dbtragt_bic")),
+            @AttributeOverride(name = "finInstnId.othr.id", column = @Column(name = "dbtragt_id")),
+            @AttributeOverride(name = "finInstnId.othr.schemeName.prtry", column = @Column(name = "dbtragt_prtry"))
+		})
 		private Agent dbtrAgt;
 		
 		@Embedded
 		@XmlElement(name = "Dbtr")
+		@AttributeOverrides({
+				@AttributeOverride(name = "nm", column = @Column(name = "dbtr_nm"))
+		})
 		private Party dbtr;
 		
 		@Embedded
 		@XmlElement(name = "DbtrAcct")
+		@AttributeOverrides({
+            @AttributeOverride(name = "id.iban", column = @Column(name = "dbtracct_iban")),
+            @AttributeOverride(name = "id.prvtId.othr.id", column = @Column(name = "dbtracct_prvtid")),
+            @AttributeOverride(name = "id.prvtId.othr.schemeName.prtry", column = @Column(name = "dbtracct_prtry"))
+		})
 		private Account dbtrAcct;
 		
 		@XmlElement(name = "RmtInf")
 		private String rmtInf;
     	
     	public Long getId() {
-        	return id;
+        	return idDrctDbt;
         }
         
-        public void setId(Long id) {
-        	this.id = id;
+        public void setId(Long idDrctDbt) {
+        	this.idDrctDbt = idDrctDbt;
         }
         
         public String getPmtId() {
@@ -453,7 +504,7 @@ public class Document {
         private String iban;
 
         @XmlElement(name = "PrvtId")
-        private String prvtId;
+        private PrivateId prvtId;
 
         public String getIban() {
 			return iban;
@@ -463,13 +514,76 @@ public class Document {
 			this.iban = iban;
 		}
 
-        public String getPrvtId() {
+        public PrivateId getPrvtId() {
 			return prvtId;
 		}
 
-        public void setPrvtId(String prvtId) {
+        public void setPrvtId(PrivateId prvtId) {
 			this.prvtId = prvtId;
 		}
+	}
+	
+	
+	@Embeddable
+	@XmlAccessorType(XmlAccessType.FIELD)
+	public static class PrivateId {
+
+	    @XmlElement(name = "Othr")
+	    @Embedded
+	    private OtherIdentification othr;
+
+	    public OtherIdentification getOthr() {
+	        return othr;
+	    }
+
+	    public void setOthr(OtherIdentification othr) {
+	        this.othr = othr;
+	    }
+	}
+	
+	
+	@Embeddable
+	@XmlAccessorType(XmlAccessType.FIELD)
+	public static class OtherIdentification {
+
+	    @XmlElement(name = "Id")
+	    private String id;
+
+	    @XmlElement(name = "SchmeNm")
+	    @Embedded
+	    private SchemeName schemeName;
+
+	    public String getId() {
+	        return id;
+	    }
+
+	    public void setId(String id) {
+	        this.id = id;
+	    }
+
+	    public SchemeName getSchemeName() {
+	        return schemeName;
+	    }
+
+	    public void setSchemeName(SchemeName schemeName) {
+	        this.schemeName = schemeName;
+	    }
+	}
+	
+	@Embeddable
+	@XmlAccessorType(XmlAccessType.FIELD)
+	public static class SchemeName {
+
+	    @XmlElement(name = "Prtry")
+	    private String prtry;
+
+	    public String getPrtry() {
+	        return prtry;
+	    }
+
+	    public void setPrtry(String prtry) {
+	        this.prtry = prtry;
+	    }
 	}
 	
 	
@@ -492,30 +606,32 @@ public class Document {
 	
 	
 	@Embeddable
-    @XmlAccessorType(XmlAccessType.FIELD)
-    public static class FinInstnId {
-        @XmlElement(name = "BIC")
-        private String bic;
+	@XmlAccessorType(XmlAccessType.FIELD)
+	public static class FinInstnId {
 
-        @XmlElement(name = "Id")
-        private String id;
+	    @XmlElement(name = "BIC")
+	    private String bic;
 
-        public String getBic() {
-			return bic;
-		}
+	    @XmlElement(name = "Othr")
+	    @Embedded
+	    private OtherIdentification othr;
 
-        public void setBic(String bic) {
-			this.bic = bic;
-		}
+	    public String getBic() {
+	        return bic;
+	    }
 
-        public String getId() {
-			return id;
-		}
+	    public void setBic(String bic) {
+	        this.bic = bic;
+	    }
 
-        public void setId(String id) {
-			this.id = id;
-		}
-    }
+	    public OtherIdentification getOthr() {
+	        return othr;
+	    }
+
+	    public void setOthr(OtherIdentification othr) {
+	        this.othr = othr;
+	    }
+	}
 	
 	
 	@Embeddable
@@ -523,6 +639,11 @@ public class Document {
     public static class AccountSchemeId {
         @XmlElement(name = "Id")
         @Embedded
+        @AttributeOverrides({
+            @AttributeOverride(name = "iban", column = @Column(name = "cdtrschmeid_iban")),
+            @AttributeOverride(name = "prvtId.othr.id", column = @Column(name = "cdtrschmeid_prvtid")),
+            @AttributeOverride(name = "prvtId.othr.schemeName.prtry", column = @Column(name = "cdtrschmeid_prtry"))
+        })
         private AccountId id;
 
         public AccountId getId() {
@@ -538,11 +659,17 @@ public class Document {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class PaymentTypeInfo {
         @XmlElement(name = "SvcLvl")
+		@AttributeOverrides({
+				@AttributeOverride(name = "cd", column = @Column(name = "svc_lvl_cd"))
+		})
         @Embedded
         private ServiceLevel svcLvl;
 
         @XmlElement(name = "LclInstrm")
         @Embedded
+		@AttributeOverrides({
+				@AttributeOverride(name = "cd", column = @Column(name = "lcl_instrm_cd"))
+		})
         private LocalInstrument lclInstrm;
 
         @XmlElement(name = "SeqTp")

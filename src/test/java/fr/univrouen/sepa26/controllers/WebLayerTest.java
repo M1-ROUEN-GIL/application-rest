@@ -58,33 +58,82 @@ public class WebLayerTest {
 
     @Test
     public void testInsertAndGetDetailAndDelete() throws Exception {
-        String validXml = 
-            "<Document xmlns=\"http://univ.fr/sepa26\">" +
-            "  <DrctDbtTxInf>" +
-            "    <PmtId>REF-TEST-INSERT</PmtId>" +
-            "    <InstdAmt Ccy=\"EUR\">500.00</InstdAmt>" +
-            "    <DrctDbtTx>" +
-            "      <MndtRltdInf>" +
-            "        <MndtId>MANDAT-TEST</MndtId>" +
-            "        <DtOfSgntr>2026-03-01</DtOfSgntr>" +
-            "      </MndtRltdInf>" +
-            "    </DrctDbtTx>" +
-            "    <DbtrAgt>" +
-            "      <FinInstnId>" +
-            "        <BIC>ROUENSWNXXX</BIC>" +
-            "      </FinInstnId>" +
-            "    </DbtrAgt>" +
-            "    <Dbtr>" +
-            "      <Nm>Client Test</Nm>" +
-            "    </Dbtr>" +
-            "    <DbtrAcct>" +
-            "      <Id>" +
-            "        <IBAN>FR7612345678901234567890123</IBAN>" +
-            "      </Id>" +
-            "    </DbtrAcct>" +
-            "  </DrctDbtTxInf>" +
-            "</Document>";
+    	String validXml =
+    		    "<Document xmlns=\"http://univ.fr/sepa26\">" +
+    		    "  <CstmrDrctDbtInitn>" +
+    		    "    <GrpHdr>" +
+    		    "      <MsgId>MSG-TEST</MsgId>" +
+    		    "      <CreDtTm>2026-03-01T10:00:00</CreDtTm>" +
+    		    "      <NbOfTxs>1</NbOfTxs>" +
+    		    "      <CtrlSum>500.00</CtrlSum>" +
+    		    "      <InitgPty>" +
+    		    "        <Nm>Test Company</Nm>" +
+    		    "      </InitgPty>" +
+    		    "    </GrpHdr>" +
+    		    "    <PmtInf>" +
+    		    "      <PmtInfId>PMT-TEST-1</PmtInfId>" +
+    		    "      <NbOfTxs>1</NbOfTxs>" +
+    		    "      <CtrlSum>500.00</CtrlSum>" +
+    		    "      <PmtTpInf>" +
+    		    "        <SvcLvl><Cd>SEPA</Cd></SvcLvl>" +
+    		    "        <LclInstrm><Cd>CORE</Cd></LclInstrm>" +
+    		    "        <SeqTp>RCUR</SeqTp>" +
+    		    "      </PmtTpInf>" +
+    		    "      <ReqdColltnDt>2026-03-10</ReqdColltnDt>" +
+    		    "      <Cdtr>" +
+    		    "        <Nm>Test Company</Nm>" +
+    		    "      </Cdtr>" +
+    		    "      <CdtrAcct>" +
+    		    "        <Id>" +
+    		    "          <IBAN>FR7612345678901234567890123</IBAN>" +
+    		    "        </Id>" +
+    		    "      </CdtrAcct>" +
+    		    "      <CdtrAgt>" +
+    		    "        <FinInstnId>" +
+    		    "          <BIC>ROUENSWNXXX</BIC>" +
+    		    "        </FinInstnId>" +
+    		    "      </CdtrAgt>" +
+    		    "      <CdtrSchmeId>" +
+    		    "        <Id>" +
+    		    "          <PrvtId>" +
+    		    "            <Othr>" +
+    		    "              <Id>FR00ZZZ123456</Id>" +
+    		    "              <SchmeNm>" +
+    		    "                <Prtry>SEPA</Prtry>" +
+    		    "              </SchmeNm>" +
+    		    "            </Othr>" +
+    		    "          </PrvtId>" +
+    		    "        </Id>" +
+    		    "      </CdtrSchmeId>" +
+    		    "      <DrctDbtTxInf>" +
+    		    "        <PmtId>REF-TEST-INSERT</PmtId>" +
+    		    "        <InstdAmt Ccy=\"EUR\">500.00</InstdAmt>" +
+    		    "        <DrctDbtTx>" +
+    		    "          <MndtRltdInf>" +
+    		    "            <MndtId>MANDAT-TEST</MndtId>" +
+    		    "            <DtOfSgntr>2026-03-01</DtOfSgntr>" +
+    		    "          </MndtRltdInf>" +
+    		    "        </DrctDbtTx>" +
+    		    "        <DbtrAgt>" +
+    		    "          <FinInstnId>" +
+    		    "            <BIC>ROUENSWNXXX</BIC>" +
+    		    "          </FinInstnId>" +
+    		    "        </DbtrAgt>" +
+    		    "        <Dbtr>" +
+    		    "          <Nm>Client Test</Nm>" +
+    		    "        </Dbtr>" +
+    		    "        <DbtrAcct>" +
+    		    "          <Id>" +
+    		    "            <IBAN>FR7612345678901234567890123</IBAN>" +
+    		    "          </Id>" +
+    		    "        </DbtrAcct>" +
+    		    "        <RmtInf>Facture Test</RmtInf>" +
+    		    "      </DrctDbtTxInf>" +
+    		    "    </PmtInf>" +
+    		    "  </CstmrDrctDbtInitn>" +
+    		    "</Document>";
 
+    	
         // 1. Insert
         MvcResult insertResult = this.mockMvc.perform(post("/sepa26/insert")
                 .contentType(MediaType.APPLICATION_XML)
@@ -101,7 +150,7 @@ public class WebLayerTest {
         // 2. Get Detail XML
         this.mockMvc.perform(get("/sepa26/xml/" + id).accept(MediaType.APPLICATION_XML))
                 .andExpect(status().isOk())
-                .andExpect(xpath("/Document/DrctDbtTxInf/PmtId").string("REF-TEST-INSERT"));
+                .andExpect(xpath("/Document/CstmrDrctDbtInitn/PmtInf/DrctDbtTxInf/PmtId").string("REF-TEST-INSERT"));
 
         // 3. Get Detail HTML
         this.mockMvc.perform(get("/sepa26/html/" + id))
