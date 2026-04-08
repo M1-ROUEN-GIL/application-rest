@@ -157,8 +157,7 @@ public class SepaService {
     }
     
     /**
-     * Valide le XML brut (String) contre le XSD — évite les problèmes
-     * d'ordre des éléments lors de la re-sérialisation JAXB
+     * Valide le XML brut en fonction du XSD
      */
     public boolean validateXSDRaw(String xmlContent) {
         try {

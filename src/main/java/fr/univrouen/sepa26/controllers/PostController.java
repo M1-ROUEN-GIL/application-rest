@@ -52,6 +52,7 @@ public class PostController {
         }
         return new SepaResponse(saved.getId(), "INSERTED");
     }*/
+    
     public SepaResponse insert(@RequestBody String xmlRaw) {
     	//System.out.println("XML reçu : " + xmlRaw);
     	try {

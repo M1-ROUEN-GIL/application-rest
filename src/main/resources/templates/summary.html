@@ -4,37 +4,237 @@
     <meta charset="UTF-8">
     <title>Résumé des transactions</title>
     <link rel="stylesheet" th:href="@{/sepa26.css}">
+    <style>
+    	.summary-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 1000px;
+        }
+
+        .no-doc {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .doc-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .doc-table th, .doc-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .doc-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .doc-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+		a.btn.btn-view:hover {
+		    color: #fff;
+		}
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .btn-delete {
+            background-color: #f44336;
+        }
+
+        .btn-delete:hover {
+            background-color: #d32f2f;
+        }
+
+        .btn-view {
+            background-color: #2196F3;
+        }
+
+        .btn-view:hover {
+            background-color: #0b7dda;
+        }
+    	.modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 400px;
+            border-radius: 8px;
+        }
+
+        .modal-title {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .modal-buttons {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+    </style>
 </head>
 <body>
+	<nav>
+        <ul>
+            <li><a th:href="@{/help}">Page d'aide</a></li>
+            <li><a th:href="@{/sepa26/resume/html}">Résumé des flux (HTML)</a></li>
+            <li><a th:href="@{/sepa26/resume/xml}">Résumé des flux (XML)</a></li>
+            <li><a th:href="@{/transfert}">Transfert</a></li>
+        </ul>
+    </nav>
     <header>
         <h1>Liste des 10 dernières transactions</h1>
         <p><a th:href="@{/}">Retour à l'accueil</a></p>
     </header>
     
-    <main>
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Identifiant</th>
-                    <th>Montant</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="doc : ${documents}">
-                    <td th:text="${doc.cstmrDrctDbtInitn.grpHdr.creDtTm}">2026-01-01</td>
-                    <td>
-                        <a th:href="@{/sepa26/html/{id}(id=${doc.id})}" 
-                           th:text="${doc.cstmrDrctDbtInitn.pmtInfs[0].drctDbtTxInfs[0].pmtId}">ID</a>
-                    </td>
-                    <td th:text="${doc.cstmrDrctDbtInitn.grpHdr.ctrlSum}">0.00</td>
-                </tr>
-            </tbody>
-        </table>
+    <main class="container">
+        <div class="summary-container">
+        	<table class="doc-table">
+	            <thead>
+	                <tr>
+	                    <th>Date</th>
+	                    <th>Identifiant</th>
+	                    <th>Montant</th>
+	                    <th></th>
+	                </tr>
+	            </thead>
+	            <tbody>
+	                <tr th:each="doc : ${documents}">
+	                    <td th:text="${doc.cstmrDrctDbtInitn.grpHdr.creDtTm}">2026-01-01</td>
+	                    <td th:text="${doc.cstmrDrctDbtInitn.pmtInfs[0].drctDbtTxInfs[0].pmtId}">ID</td>
+	                    <td th:text="${doc.cstmrDrctDbtInitn.grpHdr.ctrlSum}">0.00</td>
+	                    <td>
+	                    	<a class="btn btn-view" th:href="@{/sepa26/html/{id}(id=${doc.id})}">Voir</a>
+	                    	<button class="btn btn-delete" th:data-id="${doc.id}" onclick="confirmDelete(this.getAttribute('data-id'))">Supprimer</button>
+	                    </td>
+	                </tr>
+	            </tbody>
+	        </table>
+        </div>
     </main>
+    
+    <!-- Modal de confirmation de suppression -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3 class="modal-title">Confirmer la suppression</h3>
+            <p>Êtes-vous sûr de vouloir supprimer cete transaction ?</p>
+            <div class="modal-buttons">
+                <button class="btn" onclick="closeModal()">Annuler</button>
+                <button class="btn btn-delete" id="confirmDeleteBtn">Supprimer</button>
+            </div>
+        </div>
+    </div>
     
     <footer>
         <p>&copy; 2026 Université de Rouen Normandie</p>
     </footer>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteModal = document.getElementById('deleteModal');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        let idToDelete = null;
+
+        
+
+        // Delete confirmation
+        window.confirmDelete = function(id) {
+            idToDelete = id;
+            deleteModal.style.display = 'block';
+        };
+
+        window.closeModal = function() {
+            deleteModal.style.display = 'none';
+        };
+
+        // Handle delete confirmation
+        confirmDeleteBtn.addEventListener('click', function() {
+            if (idToDelete) {
+                // Send delete request
+                fetch(`/sepa26/delete/${idToDelete}`, {
+                    method: 'DELETE'
+                })
+                .then(res => res.text())
+                .then(data => {
+                    // Parse XML response
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(data, 'text/xml');
+
+                    const status = xmlDoc.getElementsByTagName('status')[0]?.textContent;
+
+                    if (status === 'DELETED') {
+                        // Reload page to show updated list
+                        window.location.reload();
+                    } else {
+                        alert('Erreur lors de la suppression de la transaction.');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    alert('Une erreur est survenue lors de la communication avec le serveur.');
+                })
+                .finally(() => {
+                    closeModal();
+                });
+            }
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target === deleteModal) {
+                closeModal();
+            }
+        };
+    });
+</script>
 </body>
 </html>
