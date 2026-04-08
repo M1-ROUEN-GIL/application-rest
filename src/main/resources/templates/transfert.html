@@ -4,49 +4,159 @@
     <meta charset="UTF-8">
     <title>Importer un flux XML</title>
     <link rel="stylesheet" th:href="@{/sepa26.css}">
+    <style>
+    	.form-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .btn-secondary {
+            background-color: #f44336;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d32f2f;
+        }
+
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .success {
+            background-color: #dff0d8;
+            border: 1px solid #d6e9c6;
+            color: #3c763d;
+        }
+
+        .error {
+            background-color: #f2dede;
+            border: 1px solid #ebccd1;
+            color: #a94442;
+        }
+        pre {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
 </head>
 <body>
+	<nav>
+        <ul>
+            <li><a th:href="@{/help}">Page d'aide</a></li>
+            <li><a th:href="@{/sepa26/resume/html}">Résumé des flux (HTML)</a></li>
+            <li><a th:href="@{/sepa26/resume/xml}">Résumé des flux (XML)</a></li>
+            <li><a th:href="@{/transfert}">Transfert</a></li>
+        </ul>
+    </nav>
     <header>
         <h1>Application de transfert SEPA</h1>
         <p><a th:href="@{/}">Retour à l'accueil</a></p>
     </header>
     
-    <main>
-    	<form id="transferForm">
-            <div class="form-group">
-                <label for="serverUrl">URL du serveur:</label>
-                <input type="text" id="serverUrl" value="http://localhost" required>
-            </div>
-
-            <div class="form-group">
-                <label for="serverPort">Port:</label>
-                <input type="number" id="serverPort" value="8100" min="1" max="65535" required>
-            </div>
-
-            <div class="form-group">
-                <label for="endpoint">Endpoint:</label>
-                <input type="text" id="endpoint" value="/sepa26/insert" required>
-            </div>
-
-            <div class="form-group">
-                <label for="xmlFile">Fichier XML:</label>
-                <input type="file" id="xmlFile" accept=".xml" required>
-            </div>
-
-            <div class="checkbox-group">
-                <input type="checkbox" id="validateXml">
-                <label for="validateXml">Valider le XML avant le transfert</label>
-            </div>
-
-            <button type="submit" class="btn">Transférer</button>
-            <button type="button" class="btn btn-secondary" id="resetBtn">Réinitialiser</button>
-        </form>
-
-        <div id="response" class="response">
-            <h3 id="responseTitle">Résultat</h3>
-            <p id="responseMessage"></p>
-            <pre id="responseDetails"></pre>
-        </div>
+    <main class="container">
+    	<div class="form-container">
+    		<form id="transferForm">
+	            <div class="form-group">
+	                <label for="serverUrl">URL du serveur:</label>
+	                <input type="text" id="serverUrl" value="http://localhost" required>
+	            </div>
+	
+	            <div class="form-group">
+	                <label for="serverPort">Port:</label>
+	                <input type="number" id="serverPort" value="8100" min="1" max="65535" required>
+	            </div>
+	
+	            <div class="form-group">
+	                <label for="endpoint">Endpoint:</label>
+	                <input type="text" id="endpoint" value="/sepa26/insert" required>
+	            </div>
+	
+	            <div class="form-group">
+	                <label for="xmlFile">Fichier XML:</label>
+	                <input type="file" id="xmlFile" accept=".xml" required>
+	            </div>
+	
+	            <div class="checkbox-group">
+	                <input type="checkbox" id="validateXml">
+	                <label for="validateXml">Valider le XML avant le transfert</label>
+	            </div>
+	
+	            <button type="submit" class="btn">Transférer</button>
+	            <button type="button" class="btn btn-secondary" id="resetBtn">Réinitialiser</button>
+	        </form>
+	
+	        <div id="response" class="response">
+	            <h3 id="responseTitle">Résultat</h3>
+	            <p id="responseMessage"></p>
+	            <pre id="responseDetails"></pre>
+	        </div>
+    	</div>
     </main>
     	
     <footer>
@@ -124,7 +234,7 @@
 
                 if (status === 'INSERTED') {
                     const id = xmlDoc.getElementsByTagName('id')[0]?.textContent;
-                    showSuccess('Succès', `Le flux a été transféré avec succès.`, `ID de l'article: ${id}\n\nRéponse complète:\n${data}`);
+                    showSuccess('Succès', `Le flux a été transféré avec succès.`, `ID du document: ${id}\n\nRéponse complète:\n${data}`);
                 } else {
                     const message = xmlDoc.getElementsByTagName('message')[0]?.textContent || 'Une erreur est survenue.';
                     showError('Erreur', message, `Réponse complète:\n${data}`);

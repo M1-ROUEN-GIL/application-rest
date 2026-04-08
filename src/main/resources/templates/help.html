@@ -2,76 +2,99 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aide - Projet SEPA26</title>
     <link rel="stylesheet" th:href="@{/sepa26.css}">
+    <style>
+    	.help {
+		    background-color: white;
+		    border-radius: 8px;
+		    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+		    padding: 30px;
+		    margin: 20px auto;
+		    max-width: 800px;
+		    text-align: center;
+		}
+    </style>
 </head>
 <body>
+	<nav>
+        <ul>
+            <li><a th:href="@{/help}">Page d'aide</a></li>
+            <li><a th:href="@{/sepa26/resume/html}">Résumé des flux (HTML)</a></li>
+            <li><a th:href="@{/sepa26/resume/xml}">Résumé des flux (XML)</a></li>
+            <li><a th:href="@{/transfert}">Transfert</a></li>
+        </ul>
+    </nav>
+    
     <header>
         <h1>Aide du service REST SEPA26</h1>
         <p><a th:href="@{/}">Retour à l'accueil</a></p>
     </header>
     
-    <main>
-        <table>
-            <thead>
-                <tr>
-                    <th>URL</th>
-                    <th>Méthode</th>
-                    <th>Opération</th>
-                    <th>Retour / Formats</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><code>/</code></td>
-                    <td>GET</td>
-                    <td>Affiche la page d'accueil du projet</td>
-                    <td>HTML</td>
-                </tr>
-                <tr>
-                    <td><code>/help</code></td>
-                    <td>GET</td>
-                    <td>Affiche cette page d'aide</td>
-                    <td>HTML</td>
-                </tr>
-                <tr>
-                    <td><code>/sepa26/resume/xml</code></td>
-                    <td>GET</td>
-                    <td>Affiche la liste simplifiée des 10 dernières transactions</td>
-                    <td>XML</td>
-                </tr>
-                <tr>
-                    <td><code>/sepa26/resume/html</code></td>
-                    <td>GET</td>
-                    <td>Affiche la liste simplifiée des 10 dernières transactions</td>
-                    <td>HTML</td>
-                </tr>
-                <tr>
-                    <td><code>/sepa26/xml/{id}</code></td>
-                    <td>GET</td>
-                    <td>Affiche le contenu complet de la transaction {id}</td>
-                    <td>XML</td>
-                </tr>
-                <tr>
-                    <td><code>/sepa26/html/{id}</code></td>
-                    <td>GET</td>
-                    <td>Affiche le contenu complet de la transaction {id}</td>
-                    <td>HTML</td>
-                </tr>
-                <tr>
-                    <td><code>/sepa26/insert</code></td>
-                    <td>POST</td>
-                    <td>Ajoute un flux SEPA (valide XSD)</td>
-                    <td>XML (SepaResponse)</td>
-                </tr>
-                <tr>
-                    <td><code>/sepa26/delete/{id}</code></td>
-                    <td>DELETE</td>
-                    <td>Supprime la transaction {id}</td>
-                    <td>XML (SepaResponse)</td>
-                </tr>
-            </tbody>
-        </table>
+    <main class="container">
+        <div class="help">
+        	<table>
+	            <thead>
+	                <tr>
+	                    <th>URL</th>
+	                    <th>Méthode</th>
+	                    <th>Opération</th>
+	                    <th>Retour / Formats</th>
+	                </tr>
+	            </thead>
+	            <tbody>
+	                <tr>
+	                    <td><code>/</code></td>
+	                    <td>GET</td>
+	                    <td>Affiche la page d'accueil du projet</td>
+	                    <td>HTML</td>
+	                </tr>
+	                <tr>
+	                    <td><code>/help</code></td>
+	                    <td>GET</td>
+	                    <td>Affiche cette page d'aide</td>
+	                    <td>HTML</td>
+	                </tr>
+	                <tr>
+	                    <td><code>/sepa26/resume/xml</code></td>
+	                    <td>GET</td>
+	                    <td>Affiche la liste simplifiée des 10 dernières transactions</td>
+	                    <td>XML</td>
+	                </tr>
+	                <tr>
+	                    <td><code>/sepa26/resume/html</code></td>
+	                    <td>GET</td>
+	                    <td>Affiche la liste simplifiée des 10 dernières transactions</td>
+	                    <td>HTML</td>
+	                </tr>
+	                <tr>
+	                    <td><code>/sepa26/xml/{id}</code></td>
+	                    <td>GET</td>
+	                    <td>Affiche le contenu complet de la transaction {id}</td>
+	                    <td>XML</td>
+	                </tr>
+	                <tr>
+	                    <td><code>/sepa26/html/{id}</code></td>
+	                    <td>GET</td>
+	                    <td>Affiche le contenu complet de la transaction {id}</td>
+	                    <td>HTML</td>
+	                </tr>
+	                <tr>
+	                    <td><code>/sepa26/insert</code></td>
+	                    <td>POST</td>
+	                    <td>Ajoute un flux SEPA (valide XSD)</td>
+	                    <td>XML (SepaResponse)</td>
+	                </tr>
+	                <tr>
+	                    <td><code>/sepa26/delete/{id}</code></td>
+	                    <td>DELETE</td>
+	                    <td>Supprime la transaction {id}</td>
+	                    <td>XML (SepaResponse)</td>
+	                </tr>
+	            </tbody>
+	        </table>
+        </div>
     </main>
     
     <footer>

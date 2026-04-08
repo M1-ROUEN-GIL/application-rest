@@ -1,5 +1,6 @@
 package fr.univrouen.sepa26.controllers;
 
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +17,9 @@ import fr.univrouen.sepa26.model.Document;
 import fr.univrouen.sepa26.dto.DocumentList;
 import fr.univrouen.sepa26.dto.SepaResponse;
 import fr.univrouen.sepa26.services.SepaService;
+import fr.univrouen.sepa26.util.XsltTransformer;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
 
 /**
  * Contrôleur gérant les requêtes de consultation (GET).
@@ -27,6 +31,9 @@ public class GetController {
 
     @Autowired
     private SepaService sepaService;
+    
+    @Autowired
+    private XsltTransformer xsltTransformer;
 
     /**
      * Retourne la liste des 10 derniers documents au format XML.
@@ -70,15 +77,34 @@ public class GetController {
      * @param model Le modèle Spring UI.
      * @return La vue "summary" ou "error_sepa".
      */
-    @GetMapping(value = "/html/{id}", produces = MediaType.TEXT_HTML_VALUE)
+    /*@GetMapping(value = "/html/{id}", produces = MediaType.TEXT_HTML_VALUE)
     public String getHtmlDetail(@PathVariable long id, Model model) {
         Optional<Document> doc = sepaService.getById(id);
         if (doc.isPresent()) {
             // summary.html attend une liste nommée "documents"
-            model.addAttribute("documents", List.of(doc.get()));
-            return "summary";
+            //model.addAttribute("documents", List.of(doc.get()));
+        	model.addAttribute("document", doc.get());
+            return "detail";
         }
         model.addAttribute("id", id);
         return "error_sepa";
+    }*/
+    @GetMapping(value = "/html/{id}", produces = MediaType.TEXT_HTML_VALUE)
+    @ResponseBody
+    public String getHtmlDetail(@PathVariable long id) {
+    	Optional<Document> doc = sepaService.getById(id);
+    	if (doc.isPresent()) {
+    		try {
+    			JAXBContext context = JAXBContext.newInstance(Document.class);
+    			Marshaller marshaller = context.createMarshaller();
+    			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+    			StringWriter xmlWriter = new StringWriter();
+    			marshaller.marshal(doc.get(), xmlWriter);
+    			return xsltTransformer.transformSepa(xmlWriter.toString());
+    		} catch (Exception e) {
+    			return "<pre>ERREUR : " + e.getClass().getSimpleName() + "\n" + e.getMessage() + "</pre>";
+    		}
+    	}
+    	return "<p>DOCUMENT NON TROUVÉ</p>";
     }
 }
