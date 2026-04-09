@@ -28,27 +28,34 @@ public class PostController {
      * Ajoute un nouveau document SEPA.
      * Réalise une validation XSD et vérifie l'unicité du PmtId via le service.
      * @param doc Le document envoyé dans le corps de la requête.
-     * @return Un objet SepaResponse (INSERTED ou ERROR).
+     * @return Un objet SepaResponse (INSERTED ou ERROR avec description).
      */
     @PostMapping(value = "/insert",
     		consumes = MediaType.APPLICATION_XML_VALUE,
     		produces = MediaType.APPLICATION_XML_VALUE)
     public SepaResponse insert(@RequestBody String xmlRaw) {
     	try {
-    		if (!sepaService.validateXSDRaw(xmlRaw)) {
-                return new SepaResponse("ERROR");
+    		// Validation XSD
+    		SepaService.ValidationResult validationResult = sepaService.validateXSDRawWithDetails(xmlRaw);
+    		if (!validationResult.valid) {
+                return new SepaResponse("ERROR", validationResult.errorMessage);
             }
-    		Document doc = SepaService.parseXml(xmlRaw);
-    		if (doc == null) {
-    			return new SepaResponse("ERROR");
+
+    		// Parsing XML
+    		SepaService.ParseResult parseResult = SepaService.parseXmlWithDetails(xmlRaw);
+    		if (parseResult.document == null) {
+    			return new SepaResponse("ERROR", parseResult.errorMessage);
     		}
-    		Document saved = sepaService.save(doc);
+
+    		// Sauvegarde
+    		Document saved = sepaService.save(parseResult.document);
     		if (saved == null) {
-    			return new SepaResponse("ERROR");
+    			return new SepaResponse("ERROR", "Doublon détecté : un PmtId identique existe déjà en base");
     		}
+
     		return new SepaResponse(saved.getId(), "INSERTED");
     	} catch (Exception e) {
-    		return new SepaResponse("ERROR");
+    		return new SepaResponse("ERROR", "Erreur interne : " + e.getMessage());
     	}
     }
     

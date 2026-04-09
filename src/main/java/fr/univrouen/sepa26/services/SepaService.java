@@ -31,6 +31,23 @@ public class SepaService {
     private DocumentRepository repository;
 
     /**
+     * Classe interne pour encapsuler le résultat de validation XSD.
+     */
+    public static class ValidationResult {
+        public final boolean valid;
+        public final String errorMessage;
+
+        public ValidationResult(boolean valid, String errorMessage) {
+            this.valid = valid;
+            this.errorMessage = errorMessage;
+        }
+
+        public ValidationResult(boolean valid) {
+            this(valid, null);
+        }
+    }
+
+    /**
      * Sauvegarde un document en base de données.
      * Réalise une vérification de l'unicité du PmtId (contrainte métier SEPA).
      * @param doc Le document à enregistrer.
@@ -120,6 +137,15 @@ public class SepaService {
      * @return true si le XML est conforme, false sinon.
      */
     public boolean validateXSDRaw(String xmlContent) {
+        return validateXSDRawWithDetails(xmlContent).valid;
+    }
+
+    /**
+     * Valide un flux XML brut en retournant un résultat détaillé.
+     * @param xmlContent contenu XML.
+     * @return ValidationResult avec le statut et le message d'erreur.
+     */
+    public ValidationResult validateXSDRawWithDetails(String xmlContent) {
         try {
             SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             Schema schema = sf.newSchema(new ClassPathResource("xml/sepa26.tp1.xsd").getURL());
@@ -134,27 +160,57 @@ public class SepaService {
 
             validator.validate(new javax.xml.transform.dom.DOMSource(document));
 
-            return true;
+            return new ValidationResult(true);
 
         } catch (Exception e) {
-            System.err.println("Erreur de validation XSD : " + e.getMessage());
-            return false;
+            String errorMsg = "Erreur de validation XSD : " + e.getMessage();
+            System.err.println(errorMsg);
+            return new ValidationResult(false, errorMsg);
         }
     }
     
     /**
-     * Désérialise un flux XML brut en un objet DOcument.
+     * Classe interne pour le résultat de parsing XML.
+     */
+    public static class ParseResult {
+        public final Document document;
+        public final String errorMessage;
+
+        public ParseResult(Document document) {
+            this.document = document;
+            this.errorMessage = null;
+        }
+
+        public ParseResult(String errorMessage) {
+            this.document = null;
+            this.errorMessage = errorMessage;
+        }
+    }
+
+    /**
+     * Désérialise un flux XML brut en un objet Document.
      * @param xmlContent contenu XML représentant un Document.
      * @return l'objet Document désérialisé, ou null en cas d'échec.
      */
     public static Document parseXml(String xmlContent) {
+        return parseXmlWithDetails(xmlContent).document;
+    }
+
+    /**
+     * Désérialise un flux XML brut avec capture du message d'erreur.
+     * @param xmlContent contenu XML représentant un Document.
+     * @return ParseResult avec le document ou le message d'erreur.
+     */
+    public static ParseResult parseXmlWithDetails(String xmlContent) {
         try {
             JAXBContext jc = JAXBContext.newInstance(Document.class);
-            return (Document) jc.createUnmarshaller()
+            Document doc = (Document) jc.createUnmarshaller()
                 .unmarshal(new java.io.StringReader(xmlContent));
+            return new ParseResult(doc);
         } catch (Exception e) {
-            System.err.println("Erreur de parsing XML : " + e.getMessage());
-            return null;
+            String errorMsg = "Erreur de parsing XML : " + e.getMessage();
+            System.err.println(errorMsg);
+            return new ParseResult(errorMsg);
         }
     }
     

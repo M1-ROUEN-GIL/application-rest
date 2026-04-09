@@ -176,6 +176,19 @@ public class WebLayerTest {
                 .content(invalidXml)
                 .accept(MediaType.APPLICATION_XML))
                 .andExpect(status().isOk())
-                .andExpect(xpath("/SepaResponse/status").string("ERROR"));
+                .andExpect(xpath("/SepaResponse/status").string("ERROR"))
+                .andExpect(xpath("/SepaResponse/description").exists());
+    }
+
+    @Test
+    public void testInsertMalformedXml() throws Exception {
+        String malformedXml = "<Document xmlns=\"http://univ.fr/sepa26\"><NotClosed>";
+        this.mockMvc.perform(post("/sepa26/insert")
+                .contentType(MediaType.APPLICATION_XML)
+                .content(malformedXml)
+                .accept(MediaType.APPLICATION_XML))
+                .andExpect(status().isOk())
+                .andExpect(xpath("/SepaResponse/status").string("ERROR"))
+                .andExpect(xpath("/SepaResponse/description").exists());
     }
 }
