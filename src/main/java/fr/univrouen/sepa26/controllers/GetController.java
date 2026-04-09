@@ -1,7 +1,6 @@
 package fr.univrouen.sepa26.controllers;
 
 import java.io.StringWriter;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,23 +71,11 @@ public class GetController {
     }
 
     /**
-     * Affiche le détail d'un document sur une page HTML.
-     * @param id L'identifiant technique du document.
-     * @param model Le modèle Spring UI.
-     * @return La vue "summary" ou "error_sepa".
+     * Récupère le détail d'un document en HTML via son identifiant.
+     * @param id identifiant du document à récupèrer.
+     * @return chaine HTML contenant le détail du document si trouvé, ou flux XML d'erreur
+     * 	si le document n'existe pas ou si erreur.
      */
-    /*@GetMapping(value = "/html/{id}", produces = MediaType.TEXT_HTML_VALUE)
-    public String getHtmlDetail(@PathVariable long id, Model model) {
-        Optional<Document> doc = sepaService.getById(id);
-        if (doc.isPresent()) {
-            // summary.html attend une liste nommée "documents"
-            //model.addAttribute("documents", List.of(doc.get()));
-        	model.addAttribute("document", doc.get());
-            return "detail";
-        }
-        model.addAttribute("id", id);
-        return "error_sepa";
-    }*/
     @GetMapping(value = "/html/{id}", produces = MediaType.TEXT_HTML_VALUE)
     @ResponseBody
     public String getHtmlDetail(@PathVariable long id) {
@@ -102,9 +89,37 @@ public class GetController {
     			marshaller.marshal(doc.get(), xmlWriter);
     			return xsltTransformer.transformSepa(xmlWriter.toString());
     		} catch (Exception e) {
-    			return "<pre>ERREUR : " + e.getClass().getSimpleName() + "\n" + e.getMessage() + "</pre>";
+    			return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+    	    			+ "<error>\n"
+    	    			+ "  <status>id</status>"
+    	    			+ "  <message>" + e.getMessage() + "</message>"
+    	    			+ "</error>";
     		}
     	}
-    	return "<p>DOCUMENT NON TROUVÉ</p>";
+    	return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+    			+ "<error>\n"
+    			+ "  <status>id</status>"
+    			+ "  <message>DOC NOT FOUND</message>"
+    			+ "</error>";
     }
+    
+    /*
+     *
+     * Affiche le détail d'un document sur une page HTML.
+     * @param id L'identifiant technique du document.
+     * @param model Le modèle Spring UI.
+     * @return La vue "summary" ou "error_sepa".
+     
+    @GetMapping(value = "/html/{id}", produces = MediaType.TEXT_HTML_VALUE)
+    public String getHtmlDetail(@PathVariable long id, Model model) {
+        Optional<Document> doc = sepaService.getById(id);
+        if (doc.isPresent()) {
+            // summary.html attend une liste nommée "documents"
+            //model.addAttribute("documents", List.of(doc.get()));
+        	model.addAttribute("document", doc.get());
+            return "detail";
+        }
+        model.addAttribute("id", id);
+        return "error_sepa";
+    }*/
 }

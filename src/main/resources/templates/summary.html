@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Résumé des transactions</title>
     <link rel="stylesheet" th:href="@{/sepa26.css}">
     <style>
@@ -147,7 +148,7 @@
 	                </tr>
 	            </thead>
 	            <tbody>
-	                <tr th:each="doc : ${documents}">
+	                <tr th:each="doc : ${documents}" th:if="${!#lists.isEmpty(documents)}">
 	                    <td th:text="${doc.cstmrDrctDbtInitn.grpHdr.creDtTm}">2026-01-01</td>
 	                    <td th:text="${doc.cstmrDrctDbtInitn.pmtInfs[0].drctDbtTxInfs[0].pmtId}">ID</td>
 	                    <td th:text="${doc.cstmrDrctDbtInitn.grpHdr.ctrlSum}">0.00</td>
@@ -156,6 +157,9 @@
 	                    	<button class="btn btn-delete" th:data-id="${doc.id}" onclick="confirmDelete(this.getAttribute('data-id'))">Supprimer</button>
 	                    </td>
 	                </tr>
+	                <tr th:if="${#lists.isEmpty(documents)}">
+				        <td colspan="4" class="no-doc">Aucune transaction à afficher.</td>
+				    </tr>
 	            </tbody>
 	        </table>
         </div>

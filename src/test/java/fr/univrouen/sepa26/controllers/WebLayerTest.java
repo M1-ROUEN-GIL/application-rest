@@ -37,7 +37,7 @@ public class WebLayerTest {
     public void testHelpPage() throws Exception {
         this.mockMvc.perform(get("/help"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("Aide du service REST SEPA26")))
+                .andExpect(content().string(containsString("Documentation du service REST SEPA26")))
                 .andExpect(content().string(containsString("/sepa26/resume/xml")));
     }
 

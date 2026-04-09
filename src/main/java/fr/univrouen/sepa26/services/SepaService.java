@@ -1,12 +1,12 @@
 package fr.univrouen.sepa26.services;
 
 import java.io.StringWriter;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.io.StringReader;
 
 import javax.xml.XMLConstants;
-import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
@@ -19,7 +19,6 @@ import fr.univrouen.sepa26.model.Document;
 import fr.univrouen.sepa26.repository.DocumentRepository;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.Marshaller;
-//import jakarta.xml.bind.util.JAXBSource;
 
 /**
  * Service métier pour la gestion des documents SEPA.
@@ -30,47 +29,6 @@ public class SepaService {
 
     @Autowired
     private DocumentRepository repository;
-
-    /**
-     * Valide un objet Document par rapport au schéma XSD.
-     * @param doc Le document à valider.
-     * @return true si le document est valide, false sinon.
-     */
-    /*public boolean validateXSD(Document doc) {
-        try {
-            JAXBContext jc = JAXBContext.newInstance(Document.class);
-            JAXBSource source = new JAXBSource(jc, doc);
-
-            SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = sf.newSchema(new ClassPathResource("xml/sepa26.tp1.xsd").getURL());
-
-            Validator validator = schema.newValidator();
-            validator.validate(source);
-            return true;
-        } catch (Exception e) {
-            //System.err.println("Erreur de validation XSD : " + e.getMessage());
-        	e.printStackTrace();
-            return false;
-        }
-    }
-    public boolean validateXSD(Document doc) {
-        try {
-            String xml = convertToXml(doc);
-
-            SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = sf.newSchema(new ClassPathResource("xml/sepa26.tp1.xsd").getURL());
-
-            Validator validator = schema.newValidator();
-            validator.validate(new StreamSource(new StringReader(xml)));
-
-            return true;
-        } catch (Exception e) {
-            //e.printStackTrace();
-        	System.out.println("Erreur de validation XSD : " + e.getMessage());
-            return false;
-        }
-    }
-    */
 
     /**
      * Sauvegarde un document en base de données.
@@ -157,7 +115,9 @@ public class SepaService {
     }
     
     /**
-     * Valide le XML brut en fonction du XSD
+     * Valide un flux XML brut en le comparant au schéma XSD.
+     * @param xmlContent contenu XML.
+     * @return true si le XML est conforme, false sinon.
      */
     public boolean validateXSDRaw(String xmlContent) {
         try {
@@ -183,7 +143,9 @@ public class SepaService {
     }
     
     /**
-     * Désérialise un XML brut en objet Document via JAXB
+     * Désérialise un flux XML brut en un objet DOcument.
+     * @param xmlContent contenu XML représentant un Document.
+     * @return l'objet Document désérialisé, ou null en cas d'échec.
      */
     public static Document parseXml(String xmlContent) {
         try {
@@ -195,4 +157,57 @@ public class SepaService {
             return null;
         }
     }
+    
+    /**
+     * Effectue la recherche des documents dans la base selon un date et/ou un montant.
+     * @param date date minimale pour la balise creDtTm, ou null si pas utilisé.
+     * @param sum montant minimal pour la balise ctrlSum, ou null si pas utilisé.
+     * @return
+     */
+    public List<Document> search(LocalDateTime date, Double sum) {
+    	return repository.search(date, sum);
+    }
+    
+    
+    /*
+     * /**
+     * Valide un objet Document par rapport au schéma XSD.
+     * @param doc Le document à valider.
+     * @return true si le document est valide, false sinon.
+     
+     * public boolean validateXSD(Document doc) {
+        try {
+            JAXBContext jc = JAXBContext.newInstance(Document.class);
+            JAXBSource source = new JAXBSource(jc, doc);
+
+            SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            Schema schema = sf.newSchema(new ClassPathResource("xml/sepa26.tp1.xsd").getURL());
+
+            Validator validator = schema.newValidator();
+            validator.validate(source);
+            return true;
+        } catch (Exception e) {
+            //System.err.println("Erreur de validation XSD : " + e.getMessage());
+        	e.printStackTrace();
+            return false;
+        }
+    }
+    public boolean validateXSD(Document doc) {
+        try {
+            String xml = convertToXml(doc);
+
+            SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            Schema schema = sf.newSchema(new ClassPathResource("xml/sepa26.tp1.xsd").getURL());
+
+            Validator validator = schema.newValidator();
+            validator.validate(new StreamSource(new StringReader(xml)));
+
+            return true;
+        } catch (Exception e) {
+            //e.printStackTrace();
+        	System.out.println("Erreur de validation XSD : " + e.getMessage());
+            return false;
+        }
+    }
+    */
 }
