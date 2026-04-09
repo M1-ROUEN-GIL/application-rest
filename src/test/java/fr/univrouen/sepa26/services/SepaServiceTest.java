@@ -135,28 +135,13 @@ public class SepaServiceTest {
 
         initn.getPmtInfs().add(pmtInf);
     }
-    /*
-    @Test
-    void testValidateXSD_Success() {
-        assertTrue(sepaService.validateXSD(validDoc), "Le document devrait être valide selon le XSD");
-    }
-    */
+    
     @Test
     void testValidateXSDRaw_Success() {
         String xml = sepaService.convertToXml(validDoc);
         assertTrue(sepaService.validateXSDRaw(xml));
     }
-    /*
-    @Test
-    void testValidateXSD_Failure() {
-        Document invalidDoc = new Document();
-        
-        //System.out.println(sepaService.convertToXml(invalidDoc));
-        
-        boolean valid = sepaService.validateXSD(invalidDoc);
-        assertFalse(valid, "Un document vide devrait être invalide");
-    }
-    */
+    
     @Test
     void testValidateXSDRaw_Failure() {
         String invalidXml = "<Document xmlns=\"http://univ.fr/sepa26\"></Document>";
@@ -207,6 +192,19 @@ public class SepaServiceTest {
         verify(repository, never()).deleteById(any());
     }
     /*
+    @Test
+    void testValidateXSD_Success() {
+        assertTrue(sepaService.validateXSD(validDoc), "Le document devrait être valide selon le XSD");
+    }
+    @Test
+    void testValidateXSD_Failure() {
+        Document invalidDoc = new Document();
+        
+        //System.out.println(sepaService.convertToXml(invalidDoc));
+        
+        boolean valid = sepaService.validateXSD(invalidDoc);
+        assertFalse(valid, "Un document vide devrait être invalide");
+    }
     @Test
     void testPrintXml() {
         String xml = sepaService.convertToXml(validDoc);

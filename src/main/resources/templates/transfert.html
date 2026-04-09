@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Importer un flux XML</title>
     <link rel="stylesheet" th:href="@{/sepa26.css}">
     <style>
@@ -14,6 +15,7 @@
             max-width: 800px;
         }
 
+		
         .form-group {
             margin-bottom: 15px;
         }
@@ -40,16 +42,27 @@
             border-radius: 4px;
             background-color: #f8f9fa;
         }
-
         .checkbox-group {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
+		    display: flex;
+		    align-items: center;
+		    gap: 10px;
+		    margin-bottom: 15px;
+		}
+		
+		.checkbox-group label {
+		    display: inline !important;
+		    font-weight: normal;
+		    margin: 0;
+		}
 
         .checkbox-group input[type="checkbox"] {
             margin-right: 10px;
         }
+        
+        input[type="checkbox"] {
+		    width: auto;
+		    margin-bottom: 0;
+		}
 
         .btn {
             background-color: #4CAF50;
@@ -141,12 +154,10 @@
 	                <label for="xmlFile">Fichier XML:</label>
 	                <input type="file" id="xmlFile" accept=".xml" required>
 	            </div>
-	
-	            <div class="checkbox-group">
-	                <input type="checkbox" id="validateXml">
-	                <label for="validateXml">Valider le XML avant le transfert</label>
-	            </div>
-	
+				<div class="checkbox-group">
+				    <input type="checkbox" id="validateXml">
+				    <label for="validateXml">Valider le XML avant le transfert</label>
+				</div>
 	            <button type="submit" class="btn">Transférer</button>
 	            <button type="button" class="btn btn-secondary" id="resetBtn">Réinitialiser</button>
 	        </form>

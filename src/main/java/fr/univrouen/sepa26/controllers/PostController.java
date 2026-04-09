@@ -1,13 +1,6 @@
 package fr.univrouen.sepa26.controllers;
 
-import javax.xml.XMLConstants;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import fr.univrouen.sepa26.model.Document;
 import fr.univrouen.sepa26.dto.SepaResponse;
 import fr.univrouen.sepa26.services.SepaService;
-import jakarta.xml.bind.JAXBContext;
 
 /**
  * Contrôleur REST gérant les modifications de données.
@@ -38,23 +30,10 @@ public class PostController {
      * @param doc Le document envoyé dans le corps de la requête.
      * @return Un objet SepaResponse (INSERTED ou ERROR).
      */
-    @PostMapping(value = "/insert", consumes = MediaType.APPLICATION_XML_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
-    /*public SepaResponse insert(@RequestBody Document doc) {
-        // 1. Validation XSD
-        if (!sepaService.validateXSD(doc)) {
-            return new SepaResponse("ERROR");
-        }
-
-        // 2. Sauvegarde (la vérification métier PmtId est faite dans le service)
-        Document saved = sepaService.save(doc);
-        if (saved == null) {
-            return new SepaResponse("ERROR");
-        }
-        return new SepaResponse(saved.getId(), "INSERTED");
-    }*/
-    
+    @PostMapping(value = "/insert",
+    		consumes = MediaType.APPLICATION_XML_VALUE,
+    		produces = MediaType.APPLICATION_XML_VALUE)
     public SepaResponse insert(@RequestBody String xmlRaw) {
-    	//System.out.println("XML reçu : " + xmlRaw);
     	try {
     		if (!sepaService.validateXSDRaw(xmlRaw)) {
                 return new SepaResponse("ERROR");

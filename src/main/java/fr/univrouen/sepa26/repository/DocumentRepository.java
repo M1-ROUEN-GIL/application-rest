@@ -3,8 +3,10 @@ package fr.univrouen.sepa26.repository;
 import fr.univrouen.sepa26.model.Document;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,4 +38,17 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
      */
     @Query(value = "SELECT * FROM documents ORDER BY document_id DESC LIMIT 10", nativeQuery = true)
     List<Document> findLast10();
+    
+    /**
+     * Recherche des documents en fonction de critères de date et de montant.
+     * @param date Date minimale de recherche.
+     * @param sum Montant minimal de recherche.
+     * @return La liste des documents correspondant aux critères, vide sinon.
+     */
+    @Query("SELECT d FROM Document d " +
+    		"JOIN d.cstmrDrctDbtInitn i " +
+    		"JOIN i.grpHdr g " +
+    		"WHERE (:date IS NULL OR g.creDtTm >= :date) " +
+    		"AND (:sum IS NULL OR g.ctrlSum >= :sum)")
+    List<Document> search(@Param("date") LocalDateTime date, @Param("sum") Double sum);
 }
