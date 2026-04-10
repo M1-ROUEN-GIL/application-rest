@@ -13,9 +13,9 @@ REST pour récupérer et gérer les données selon la spécification SEPA26, ave
 
 ## Architecture
 L'application est structurée selon le modèle MVC :
-- **Modèles** : Classe Java représentant les entités de données
+- **Modèles** : Classe Java représentant les entités de données et la logique métier
 - **Vues** : Templates Thymeleaf pour le rendu HTML
-- **Contrôleurs**: Classes Java gérant les requêtes HTTP et la logique métier
+- **Contrôleurs**: Classes Java gérant les requêtes HTTP
 
 ## Pré-requis
 - Kit de développement Java (SDK) 21 ou version supérieure
@@ -23,27 +23,8 @@ L'application est structurée selon le modèle MVC :
 - Git
 - MariaDB
 
-## Démarrage
-### Clôner le dépôt
-```bash
-git clone https//https://github.com/M1-ROUEN-GIL/application-rest
-cd application-rest
-```
-
-### Compiler le projet
-```bash
-mvn clean package
-```
-
-### Exécuter l'application localement
-```bash
-mvn spring-boot:run
-```
-
-L'appliation démarrera sur le port 8100 par défaut. Vous pouvez y accéder à l'adresse http://localhost:8100
-
 ## Points de terminaison API
-L'application expose plusieurs points de terminaisaon REST :
+L'application expose plusieurs points de terminaison REST :
 ### Gestion des flux
 - `GET /sepa26/resume/xml` - Obtenir toutes les trasactions au format XML
 - `GET /sepa26/resume/html` - Obtenir toutes les trasactions au format HTML
@@ -54,11 +35,15 @@ L'application expose plusieurs points de terminaisaon REST :
 - `DELETE /sepa26/delete/{id}` - Supprimer une transaction par ID
 
 ## Déploiement
-L'application est déployée 
+L'application est déployée sur les serveurs suivants:
+- vm-pepinflo-xml.univ-rouen.fr / 10.130.162.188
+- vm-ouattumm-xml.univ-rouen.fr / 10.130.162.187
+
+L'appliation démarrera sur le port 8100 par défaut. Vous pouvez y accéder à l'adresse http://localhost:8100
 
 ## Contributeurs
 - Florian Pépin (florian.pepin@etu.univ-rouen.fr)
 - Umm-Habibah Ouattara (umm-habibah.ouattara@etu.univ-rouen.fr)
 
 ## Licence
-Ce projet est dévloppée dans le cadre d'un cours XML à l'Université de Rouen.
+Ce projet est développée dans le cadre d'un cours XML à l'Université de Rouen.
