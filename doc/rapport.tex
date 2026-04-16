@@ -183,6 +183,18 @@ Le développement du projet a été équitablement réparti entre les deux membr
     \caption{Répartition détaillée des tâches}
 \end{table}
 
+\section{Configuration de Jenkins}
+Pour le déploiement de notre service REST, nous avons utilisés Jenkins. Jenkins est un outils d'automatisation de toutes sortes de tâches dont la CI/CD, les tests et même le déploiement. Voici comment nous avons configurés l'outil :
+\begin{itemize}
+    \item Tout d'abord nous avons configurer, la VM de sorte qu'elle contienne notre projet, et que ce dernier soit suivi par git. Par conséquent, à chaque push, le projet sur la VM est automatiquement mis à jour. 
+    \item Nous avons ensuite créer plusieurs jobs :
+    \begin{itemize}
+        \item Création de l'exécutable du projet (.war ou .jar)
+        \item Lancement du projet via docker
+        \item À chaque mise à jour du code, lancement des jobs de manière automatique
+    \end{itemize}
+\end{itemize}
+
 \section{Éléments Optionnels}
 Nous avons ajouté quelques fonctionnalités pour rendre le service plus simple à utiliser depuis un navigateur :
 
