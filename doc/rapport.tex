@@ -184,7 +184,7 @@ Le développement du projet a été équitablement réparti entre les deux membr
 \end{table}
 
 \section{Configuration de Jenkins}
-Pour le déploiement de notre service REST, nous avons utilisés Jenkins. Jenkins est un outils d'automatisation de toutes sortes de tâches dont la CI/CD, les tests et même le déploiement. Voici comment nous avons configurés l'outil :
+Pour le déploiement de notre service REST, nous avons utilisés Jenkins. Jenkins est un outils pour gérer la CI/CD d'un projet. Voici comment nous avons configurés l'outil :
 \begin{itemize}
     \item Tout d'abord nous avons configurer, la VM de sorte qu'elle contienne notre projet, et que ce dernier soit suivi par git. Par conséquent, à chaque push, le projet sur la VM est automatiquement mis à jour. 
     \item Nous avons ensuite créer plusieurs jobs :
@@ -193,6 +193,13 @@ Pour le déploiement de notre service REST, nous avons utilisés Jenkins. Jenkin
         \item Lancement du projet via docker
         \item À chaque mise à jour du code, lancement des jobs de manière automatique
     \end{itemize}
+\end{itemize}
+
+\subsection{Améliorations de la configuration Jenkins}
+Nous avons effectués quelques améliorations des jobs précédents:
+\begin{itemize}
+    \item Pour le job d'exécution, avant la création du .war ou du .jar, nous avons défini une règle qui nous permet de lancer les tests unitaires et d'intégrations. Il est très important de noter ici, que c'est bien maven qui fait ces tests.
+    \item Ensuite, pour ce qui est de Docker, nous avons fait en sorte d'y intégrer directement une base de données MariaDB ainsi que 2 transactions SEPA
 \end{itemize}
 
 \section{Éléments Optionnels}
