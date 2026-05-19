@@ -1,0 +1,337 @@
+{
+	"info": {
+		"_postman_id": "08f95dd9-ac01-4def-9012-ac94c8654b61",
+		"name": "sepa26_pepin_ouattara",
+		"description": "La variable définie sous le nom [http://localhost:8100](http://localhost:8100) doit être changé en [http://10.130.162.188:8100/](http://10.130.162.188:8100/) qui est notre serveur",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43262541"
+	},
+	"item": [
+		{
+			"name": "http://localhost:8100/sepa26/insert",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/xml",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/xml",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<p:Document xmlns:p=\"http://univ.fr/sepa26\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://univ.fr/sepa26 sepa26.tp1.xsd \">\n  <p:CstmrDrctDbtInitn>\n    <p:GrpHdr>\n      <p:MsgId>MSGID-8338743</p:MsgId>\n      <p:CreDtTm>2026-05-19T10:25:00</p:CreDtTm>\n      <p:NbOfTxs>3</p:NbOfTxs>\n      <p:CtrlSum>6530.15</p:CtrlSum>\n      <p:InitgPty>\n        <p:Nm>Societe AA</p:Nm>\n      </p:InitgPty>\n    </p:GrpHdr>\n    <p:PmtInf>\n      <p:PmtInfId>REF Remise 888</p:PmtInfId>\n      <p:NbOfTxs>2</p:NbOfTxs>\n      <p:CtrlSum>3250.15</p:CtrlSum>\n      <p:PmtTpInf>\n        <p:SvcLvl>\n          <p:Cd>SEPA</p:Cd>\n        </p:SvcLvl>\n        <p:LclInstrm>\n          <p:Cd>CORE</p:Cd>\n        </p:LclInstrm>\n        <p:SeqTp>RCUR</p:SeqTp>\n      </p:PmtTpInf>\n      <p:ReqdColltnDt>2026-05-19</p:ReqdColltnDt>\n      <p:Cdtr>\n        <p:Nm>Societe AA</p:Nm>\n      </p:Cdtr>\n      <p:CdtrAcct>\n        <p:Id>\n          <p:IBAN>FR7610041010050500013M02606</p:IBAN>\n        </p:Id>\n      </p:CdtrAcct>\n      <p:CdtrAgt>\n        <p:FinInstnId>\n          <p:BIC>BANKFRPP</p:BIC>\n        </p:FinInstnId>\n      </p:CdtrAgt>\n      <p:CdtrSchmeId>\n        <p:Id>\n          <p:PrvtId>\n            <p:Othr>\n              <p:Id>FR00ZZZ123456</p:Id>\n              <p:SchmeNm>\n                <p:Prtry>SEPA</p:Prtry>\n              </p:SchmeNm>\n            </p:Othr>\n          </p:PrvtId>\n        </p:Id>\n      </p:CdtrSchmeId>\n      <p:DrctDbtTxInf>\n        <p:PmtId>REF OPE JJSJSJ</p:PmtId>\n        <p:InstdAmt Ccy=\"EUR\">1100.07</p:InstdAmt>\n        <p:DrctDbtTx>\n          <p:MndtRltdInf>\n            <p:MndtId>MANDAT NO 99999</p:MndtId>\n            <p:DtOfSgntr>2026-05-19</p:DtOfSgntr>\n          </p:MndtRltdInf>\n        </p:DrctDbtTx>\n        <p:DbtrAgt>\n          <p:FinInstnId>\n            <p:BIC>BANQBEBB</p:BIC>\n          </p:FinInstnId>\n        </p:DbtrAgt>\n        <p:Dbtr>\n          <p:Nm>Mr Debiteur N1</p:Nm>\n        </p:Dbtr>\n        <p:DbtrAcct>\n          <p:Id>\n            <p:IBAN>FR763004136210001234567811</p:IBAN>\n          </p:Id>\n        </p:DbtrAcct>\n        <p:RmtInf>Facture N1</p:RmtInf>\n      </p:DrctDbtTxInf>\n    </p:PmtInf>\n  </p:CstmrDrctDbtInitn>\n</p:Document>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/insert",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"insert"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8100/sepa26/resume/xml",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "text/html",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/resume/html",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"resume",
+						"html"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8100/sepa26/resume/html",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "text/html",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/resume/html",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"resume",
+						"html"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8100/sepa26/resume/html/3",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "text/html",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/html/3",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"html",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8100/sepa26/resume/xml/3",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/xml",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/xml",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/xml/3",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"xml",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8100/sepa26/search?date=2026-05-19",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/xml",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/xml",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/search?date=2026-05-19",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"search"
+					],
+					"query": [
+						{
+							"key": "date",
+							"value": "2026-05-19"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8100/sepa26/search?sum=6530.15",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/xml",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/xml",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/search?sum=6530.15",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"search"
+					],
+					"query": [
+						{
+							"key": "sum",
+							"value": "6530.15"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8100/sepa26/delete/3",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/xml",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/xml",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/delete/3",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"delete",
+						"3"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "",
+			"type": "default"
+		}
+	]
+}
