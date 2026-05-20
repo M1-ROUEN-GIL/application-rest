@@ -220,7 +220,8 @@
             }
 
             // Construct the full URL
-            const url = `${serverUrl.value}:${serverPort.value}${endpoint.value}`;
+            const b = validateXml.checked
+            const url = `${serverUrl.value}:${serverPort.value}${endpoint.value}?validate=${b}`;
 
             // Send XML to server
             fetch(url, {
