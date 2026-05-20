@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.univrouen.sepa26.model.Document;
@@ -33,8 +34,14 @@ public class PostController {
     @PostMapping(value = "/insert",
     		consumes = MediaType.APPLICATION_XML_VALUE,
     		produces = MediaType.APPLICATION_XML_VALUE)
-    public SepaResponse insert(@RequestBody String xmlRaw) {
+    public SepaResponse insert(@RequestBody String xmlRaw, @RequestParam(value = "validate", defaultValue = "true") boolean validate) {
     	try {
+    		if (validate) {
+    			SepaService.ValidationResult validateResult = sepaService.validateXSDRawWithDetails(xmlRaw);
+    			if (!validateResult.valid) {
+    				return new SepaResponse("ERROR", validateResult.errorMessage);
+    			}
+    		}
     		// Validation XSD
     		SepaService.ValidationResult validationResult = sepaService.validateXSDRawWithDetails(xmlRaw);
     		if (!validationResult.valid) {
