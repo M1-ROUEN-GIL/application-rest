@@ -2,13 +2,13 @@
 	"info": {
 		"_postman_id": "08f95dd9-ac01-4def-9012-ac94c8654b61",
 		"name": "sepa26_pepin_ouattara",
-		"description": "La variable définie sous le nom [http://localhost:8100](http://localhost:8100) doit être changé en [http://10.130.162.188:8100/](http://10.130.162.188:8100/) qui est notre serveur",
+		"description": "Utilise la variable {{base_url}} pour définir l'adresse du serveur (par défaut http://10.130.162.188:8100/sepa26)",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "43262541"
 	},
 	"item": [
 		{
-			"name": "http://localhost:8100/sepa26/insert",
+			"name": "{{base_url}}/insert",
 			"request": {
 				"auth": {
 					"type": "noauth"
@@ -48,7 +48,7 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:8100/sepa26/resume/xml",
+			"name": "{{base_url}}/resume/xml",
 			"request": {
 				"auth": {
 					"type": "noauth"
@@ -80,7 +80,7 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:8100/sepa26/resume/html",
+			"name": "{{base_url}}/resume/html",
 			"request": {
 				"auth": {
 					"type": "noauth"
@@ -112,7 +112,7 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:8100/sepa26/resume/html/3",
+			"name": "{{base_url}}/resume/html/3",
 			"request": {
 				"auth": {
 					"type": "noauth"
@@ -144,7 +144,7 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:8100/sepa26/resume/xml/3",
+			"name": "{{base_url}}/resume/xml/3",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -188,7 +188,7 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:8100/sepa26/search?date=2026-05-19",
+			"name": "{{base_url}}/search?date=2026-05-19",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -237,7 +237,7 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:8100/sepa26/search?sum=6530.15",
+			"name": "{{base_url}}/search?sum=6530.15",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -286,7 +286,7 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:8100/sepa26/delete/3",
+			"name": "{{base_url}}/delete/3",
 			"request": {
 				"auth": {
 					"type": "noauth"
@@ -330,7 +330,7 @@
 	"variable": [
 		{
 			"key": "base_url",
-			"value": "",
+			"value": "http://10.130.162.188:8100/sepa26",
 			"type": "default"
 		}
 	]
