@@ -42,11 +42,6 @@ public class PostController {
     				return new SepaResponse("ERROR", validateResult.errorMessage);
     			}
     		}
-    		// Validation XSD
-    		SepaService.ValidationResult validationResult = sepaService.validateXSDRawWithDetails(xmlRaw);
-    		if (!validationResult.valid) {
-                return new SepaResponse("ERROR", validationResult.errorMessage);
-            }
 
     		// Parsing XML
     		SepaService.ParseResult parseResult = SepaService.parseXmlWithDetails(xmlRaw);
