@@ -208,7 +208,8 @@ public class SepaService {
                 .unmarshal(new java.io.StringReader(xmlContent));
             return new ParseResult(doc);
         } catch (Exception e) {
-            String errorMsg = "Erreur de parsing XML : " + e.getMessage();
+            String message = (e.getMessage() != null) ? e.getMessage() : e.toString();
+            String errorMsg = "Erreur de parsing XML (JAXB) : " + message;
             System.err.println(errorMsg);
             return new ParseResult(errorMsg);
         }
