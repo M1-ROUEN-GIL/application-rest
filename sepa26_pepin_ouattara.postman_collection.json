@@ -112,7 +112,7 @@
 			"response": []
 		},
 		{
-			"name": "{{base_url}}/resume/html/3",
+			"name": "{{base_url}}/resume/html/{id}",
 			"request": {
 				"auth": {
 					"type": "noauth"
@@ -131,7 +131,7 @@
 					}
 				],
 				"url": {
-					"raw": "{{base_url}}/html/3",
+					"raw": "{{base_url}}/html/1",
 					"host": [
 						"{{base_url}}"
 					],
@@ -144,7 +144,7 @@
 			"response": []
 		},
 		{
-			"name": "{{base_url}}/resume/xml/3",
+			"name": "{{base_url}}/resume/xml/{id}",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -175,7 +175,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/xml/3",
+					"raw": "{{base_url}}/xml/1",
 					"host": [
 						"{{base_url}}"
 					],
@@ -286,7 +286,7 @@
 			"response": []
 		},
 		{
-			"name": "{{base_url}}/delete/3",
+			"name": "{{base_url}}/delete/{id}",
 			"request": {
 				"auth": {
 					"type": "noauth"
@@ -314,7 +314,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/delete/3",
+					"raw": "{{base_url}}/delete/1",
 					"host": [
 						"{{base_url}}"
 					],
