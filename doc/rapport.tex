@@ -62,26 +62,75 @@
 
 \newpage
 
+\tableofcontents
+
+\newpage
+
 \section{Introduction}
 
-Ce projet porte sur la réalisation du service REST SEPA26. L'objectif est de construire une architecture basé sur la norme ISO 20022 fourni en cours pour gérer des transactions. Le déploiement est automatisé sur une VM via Jenkins. \\
-Il est réalisé par Umm-Habibah Ouattara et Florian Pépin.
+Ce projet porte sur la réalisation du service REST SEPA26. L'objectif est de construire une architecture basé sur la norme ISO 20022 fourni en cours pour gérer des transactions. Le déploiement est automatisé sur une VM via Jenkins.
+
+\section{Identification du Projet}
+
+\begin{itemize}
+    \item \textbf{Étudiants :} Umm-Habibah Ouattara et Florian Pépin
+    \item \textbf{Nom de la VM :} \texttt{vm-pepinflo-xml.univ-rouen.fr}
+    \item \textbf{Adresse IP :} \texttt{10.130.162.188}
+    \item \textbf{URL de l'application :} \url{http://10.130.162.188:8100/}
+\end{itemize}
+
+\newpage
 
 \section{Architecture du Projet}
 
-\subsection{Stack Technique}
-Le service SEPA26 repose sur une architecture Java 21. La stack technique mis en place est le suivant :
+L'application est structurée selon un modèle classique en couches (Layered Architecture), garantissant une séparation claire des responsabilités.
+
+\subsection{Organisation Logicielle}
+L'application suit une architecture en couches, dont voici les responsabilités principales :
 \begin{itemize}
-    \item \textbf{Framework :} Spring Boot. Spring Web est utilisé pour l'exposition des API REST et Spring Data JPA pour la persistance des données.
-    \item \textbf{Gestion des dépendances et Build :} Maven.
-    \item \textbf{Stockage des données :} MariaDB et H2 (base de données embarquée pour les tests).
-    \item \textbf{Traitement XML :} Les échanges se font au format XML en respectant la norme ISO 20022. Le projet intègre JAXB et Jackson-XML pour la sérialisation/désérialisation, ainsi que Saxon-HE pour des manipulations avancées (XSLT/XPath).
-	\item \textbf{Interface (Front-end) :} Le projet utilise Thymeleaf pour
-  générer les pages web. Cela permet de transformer et d'afficher les données Java/XML en pages HTML.
+    \item \textbf{Couche de Présentation (Web/API) :} Gère les requêtes HTTP via les contrôleurs et assure le rendu des vues.
+    \item \textbf{Couche de Service :} Centralise la logique métier et les règles de gestion.
+    \item \textbf{Couche d'Accès aux Données :} Assure la persistance via Spring Data JPA.
+    \item \textbf{DTO \& Utilitaires :} Facilitent le transfert de données et les transformations XML/XSLT.
+\end{itemize}
+
+\subsubsection{Détail des composants principaux}
+\begin{longtable}{|l|p{10cm}|}
+    \hline
+    \textbf{Classe / Composant} & \textbf{Rôle et Responsabilité} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Classe / Composant} & \textbf{Rôle et Responsabilité} \\
+    \hline
+    \endhead
+    \texttt{Sepa26Application} & Point d'entrée principal qui démarre l'application Spring Boot. \\ \hline
+    \texttt{SepaService} & Centralise la logique métier et coordonne les opérations sur les transactions. \\ \hline
+    \texttt{Document} & Entité représentant une transaction SEPA et sa structure en base de données. \\ \hline
+    \texttt{DocumentRepository} & Interface assurant le lien entre l'application et la base de données MariaDB. \\ \hline
+    \texttt{GetController} & Gère la récupération et l'affichage des transactions (XML et HTML). \\ \hline
+    \texttt{PostController} & Traite l'insertion de nouvelles transactions et les demandes de suppression. \\ \hline
+    \texttt{SearchController} & Propose des fonctionnalités de recherche multicritères sur les transactions. \\ \hline
+    \texttt{IndexController} & Gère la navigation vers la page d'accueil et la documentation d'aide. \\ \hline
+    \texttt{TransfertController} & Fournit l'interface pour l'importation de fichiers XML par l'utilisateur. \\ \hline
+    \texttt{XsltTransformer} & Transforme les données XML brutes en pages HTML lisibles via des feuilles XSLT. \\ \hline
+    \texttt{DocumentList} & DTO utilisé pour formater une collection de documents dans les réponses XML. \\ \hline
+    \texttt{SepaResponse} & Structure standardisée pour les messages de retour (succès/erreur) de l'API. \\ \hline
+    \texttt{DataInitializer} & Initialise la persistance avec des données de test lors du démarrage du serveur. \\ \hline
+\end{longtable}
+
+\subsection{Stack Technique}
+Le service repose sur une stack Java 21 moderne et robuste :
+\begin{itemize}
+    \item \textbf{Framework :} Spring Boot (Spring Web, Spring Data JPA).
+    \item \textbf{Gestion des dépendances :} Maven.
+    \item \textbf{Stockage :} MariaDB (Production) et H2 (Tests).
+    \item \textbf{Traitement XML :} JAXB, Jackson-XML et Saxon-HE (XSLT/XPath).
+    \item \textbf{Interface :} Thymeleaf pour le rendu des vues HTML dynamiques.
 \end{itemize}
 
 \subsection{Points d'accès (Endpoints)}
-L'API est organisée autour de la ressource "Transaction". Le tableau suivant récapitule les principaux points d'entrée du service sous le préfixe \texttt{/sepa26} :
+Le tableau suivant récapitule l'ensemble des points d'entrée du service (API REST et Interface Web) accessibles sous le préfixe \texttt{/sepa26} :
 
 \begin{table}[h]
     \centering
@@ -90,68 +139,29 @@ L'API est organisée autour de la ressource "Transaction". Le tableau suivant r�
         \hline
         \textbf{Méthode} & \textbf{Endpoint} & \textbf{Description / Format de sortie} \\
         \hline
+        \texttt{GET} & \texttt{/} & Page d'accueil du service \\
+        \hline
+        \texttt{GET} & \texttt{/help} & Page d'aide et documentation de l'API \\
+        \hline
+        \texttt{GET} & \texttt{/transfert} & Interface d'importation de fichiers XML \\
+        \hline
         \texttt{POST} & \texttt{/insert} & Création d'un virement (Flux XML ISO 20022) \\
         \hline
         \texttt{DELETE} & \texttt{/delete/\{id\}} & Suppression d'une transaction (Retour XML) \\
         \hline
-        \texttt{GET} & \texttt{/resume/xml} & Liste de toutes les transactions en XML \\
+        \texttt{GET} & \texttt{/resume/xml} & Liste de toutes les transactions (XML) \\
         \hline
-        \texttt{GET} & \texttt{/resume/html} & Liste de toutes les transactions en HTML \\
+        \texttt{GET} & \texttt{/resume/html} & Liste de toutes les transactions (HTML) \\
         \hline
         \texttt{GET} & \texttt{/xml/\{id\}} & Détail complet d'une transaction (XML) \\
         \hline
         \texttt{GET} & \texttt{/html/\{id\}} & Détail complet d'une transaction (HTML) \\
         \hline
-        \texttt{GET} & \texttt{/search} & Recherche avancée de transactions (XML) \\
+        \texttt{GET} & \texttt{/search} & Recherche avancée multicritères (XML) \\
         \hline
     \end{tabularx}
-    \caption{Récapitulatif des services REST}
+    \caption{Récapitulatif des services et pages web}
 \end{table}
-
-En complément, l'application propose des pages web classiques (\texttt{/}, \texttt{/help}, \texttt{/transfert}) pour la navigation utilisateur.
-
-\newpage
-
-\section{Accès aux Services (VM)}
-L'ensemble des services est déployé sur une machine virtuelle dédiée. Voici les informations nécessaires pour y accéder :
-
-\subsection{Informations de la VM}
-\begin{itemize}
-    \item \textbf{Hostname :} \texttt{vm-pepinflo-xml.univ-rouen.fr}
-    \item \textbf{Adresse IP :} \texttt{10.130.162.188}
-\end{itemize}
-
-\subsection{Identifiants des utilisateurs}
-Les comptes suivants ont été configurés pour l'accès et les tests :
-\begin{table}[h]
-    \centering
-    \begin{tabular}{|l|l|l|}
-        \hline
-        \textbf{Usage} & \textbf{Utilisateur} & \textbf{Mot de passe} \\
-        \hline
-        Admin & \texttt{spring} & \texttt{abcd1230} \\
-        \hline
-        Projet REST & \texttt{user-git} & \texttt{user-git} \\
-        \hline
-        Tests sur la VM & \texttt{test} & \texttt{test} \\
-        \hline
-    \end{tabular}
-    \caption{Identifiants de la VM}
-\end{table}
-
-\subsection{Accès Jenkins}
-Le serveur Jenkins est accessible via :
-\begin{itemize}
-    \item \textbf{URL :} \url{http://10.130.162.188:8080}
-    \item \textbf{Login :} \texttt{jobadmin}
-    \item \textbf{Mot de passe :} \texttt{JobAdmin26}
-\end{itemize}
-
-\subsection{Service REST SEPA26}
-L'application est exposée sur le port \textbf{8100} et prête à recevoir des requêtes :
-\begin{itemize}
-    \item \textbf{Interface Web :} \url{http://10.130.162.188:8100/}
-\end{itemize}
 
 \newpage
 
@@ -183,24 +193,43 @@ Le développement du projet a été équitablement réparti entre les deux membr
     \caption{Répartition détaillée des tâches}
 \end{table}
 
-\section{Configuration de Jenkins}
-Pour le déploiement de notre service REST, nous avons utilisés Jenkins. Jenkins est un outils pour gérer la CI/CD d'un projet. Voici comment nous avons configurés l'outil :
+\newpage
+
+\section{Description de l'usine logicielle}
+
+Afin d'assurer une livraison fluide et automatisée du service SEPA26, nous avons mis en place une usine logicielle complète intégrant l'Intégration Continue (CI) et le Déploiement Continu (CD).
+
+\subsection{Surveillance et Déclenchement}
+L'usine logicielle s'appuie sur une scrutation active (Polling SCM) du dépôt de gestion de version. Jenkins vérifie chaque minute (\texttt{* * * * *}) si de nouvelles modifications ont été apportées au code source. Si un changement est détecté, le cycle de build est automatiquement lancé.
+
+\subsection{Chaîne de Build et Automatisation}
+Le processus est orchestré par un \texttt{Jenkinsfile} (Pipeline) structuré en plusieurs étapes clés :
+
 \begin{itemize}
-    \item Tout d'abord nous avons configurer, la VM de sorte qu'elle contienne notre projet, et que ce dernier soit suivi par git. Par conséquent, à chaque push, le projet sur la VM est automatiquement mis à jour. 
-    \item Nous avons ensuite créer plusieurs jobs :
-    \begin{itemize}
-        \item Création de l'exécutable du projet (.war ou .jar)
-        \item Lancement du projet via docker
-        \item À chaque mise à jour du code, lancement des jobs de manière automatique
-    \end{itemize}
+    \item \textbf{Préparation :} Initialisation de l'environnement, création d'un réseau Docker dédié (\texttt{sepa-network}) pour isoler les communications et nettoyage des anciens conteneurs.
+    \item \textbf{Gestion des Données (MariaDB) :} Lancement automatique d'un conteneur MariaDB. La persistance est assurée par un volume Docker et les accès sont sécurisés via l'utilisation des \textit{Credentials} Jenkins pour masquer les mots de passe.
+    \item \textbf{Compilation et Packaging (Maven) :} Exécution de la commande \texttt{mvn package} qui assure la compilation, le passage des tests unitaires et d'intégration, et la génération de l'artefact exécutable.
+    \item \textbf{Conteneurisation (Docker) :} Construction de l'image Docker de l'application intégrant l'artefact généré.
+    \item \textbf{Déploiement :} Lancement du conteneur applicatif sur le port \texttt{8100}, lié dynamiquement à la base de données MariaDB via les variables d'environnement.
 \end{itemize}
 
-\subsection{Améliorations de la configuration Jenkins}
-Nous avons effectués quelques améliorations des jobs précédents:
+\subsection{Sécurité et Isolation}
+L'architecture de l'usine logicielle privilégie la sécurité :
 \begin{itemize}
-    \item Pour le job d'exécution, avant la création du .war ou du .jar, nous avons défini une règle qui nous permet de lancer les tests unitaires et d'intégrations. Il est très important de noter ici, que c'est bien maven qui fait ces tests.
-    \item Ensuite, pour ce qui est de Docker, nous avons fait en sorte d'y intégrer directement une base de données MariaDB ainsi que 2 transactions SEPA
+    \item \textbf{Secrets :} Aucun mot de passe n'est stocké en clair dans les scripts ; Jenkins injecte dynamiquement les secrets au moment de l'exécution.
+    \item \textbf{Réseau :} L'utilisation d'un réseau Docker \textit{bridge} assure que seul le serveur applicatif est exposé à l'extérieur, la base de données n'étant accessible que par l'application au sein du réseau privé Docker.
 \end{itemize}
+
+\newpage
+
+\subsection{Maintenance et Redémarrage}
+Grâce à l'automatisation via Jenkins et Docker, le redémarrage ou la mise à jour du service est simplifié :
+\begin{itemize}
+    \item \textbf{Redémarrage via Jenkins :} Une simple action \textit{"Lancer un build"} sur l'interface Jenkins suffit à déclencher le pipeline complet. Le script se charge de stopper les instances existantes, de recompiler le code et de relancer proprement les conteneurs MariaDB et SEPA26.
+    \item \textbf{Redémarrage manuel :} En cas de besoin, il est également possible de redémarrer le service manuellement sur la VM via les commandes Docker (\texttt{docker restart servicesepa26}).
+\end{itemize}
+
+\newpage
 
 \section{Éléments Optionnels}
 Nous avons ajouté quelques fonctionnalités pour rendre le service plus simple à utiliser depuis un navigateur :
@@ -211,7 +240,38 @@ Nous avons ajouté quelques fonctionnalités pour rendre le service plus simple 
     \item \textbf{Collection Postman :} Nous avons fournit le fichier \texttt{sepa26\_pepin\_ouattara.json} qui contient déjà toutes les requêtes prêtes à l'emploi pour tester le serveur (VM).
 \end{itemize}
 
-\section{Conclusion}
-Le projet remplit l'ensemble des objectifs fixés. L'utilisation de Spring Boot couplée aux technologies XML (XSD, JAXB) a permis de construire un service robuste, déployé de manière sérieuse sur une VM avec une chaîne CI/CD fonctionnelle.
+\newpage
+
+\section{Identifiants et Accès aux Services}
+Cette section regroupe les identifiants nécessaires pour accéder aux différents outils de l'usine logicielle et tester le service.
+
+\subsection{Identifiants des utilisateurs (VM)}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|l|l|}
+        \hline
+        \textbf{Usage} & \textbf{Utilisateur} & \textbf{Mot de passe} \\
+        \hline
+        Admin & \texttt{spring} & \texttt{abcd1230} \\
+        \hline
+        Projet REST & \texttt{user-git} & \texttt{user-git} \\
+        \hline
+        Tests sur la VM & \texttt{test} & \texttt{test} \\
+        \hline
+    \end{tabular}
+    \caption{Identifiants de la VM}
+\end{table}
+
+\subsection{Accès Jenkins}
+\begin{itemize}
+    \item \textbf{URL :} \url{http://10.130.162.188:8080}
+    \item \textbf{Login :} \texttt{jobadmin}
+    \item \textbf{Mot de passe :} \texttt{JobAdmin26}
+\end{itemize}
+
+\subsection{Service REST SEPA26}
+\begin{itemize}
+    \item \textbf{Interface Web :} \url{http://10.130.162.188:8100/}
+\end{itemize}
 
 \end{document}
