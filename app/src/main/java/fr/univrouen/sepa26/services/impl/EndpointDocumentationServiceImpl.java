@@ -81,7 +81,8 @@ public class EndpointDocumentationServiceImpl implements EndpointDocumentationSe
             "POST",
             "Ajoute un nouveau document en base",
             "XML",
-            "Flux XML ISO 20022 à insérer. Le flux est validé par le schéma XSD (paramètre validate optionnel). Vérifie l'unicité du PmtId. Retourne le statut INSERTED avec l'identifiant généré ou ERROR."
+            "Flux XML ISO 20022 à insérer. Le flux est validé par le schéma XSD (paramètre validate optionnel). "
+                + "Vérifie l'unicité du PmtId. Retourne le statut INSERTED avec l'identifiant généré ou ERROR."
         ));
 
         list.add(createEndpoint(
@@ -89,7 +90,8 @@ public class EndpointDocumentationServiceImpl implements EndpointDocumentationSe
             "DELETE",
             "Supprime le document dont l'identifiant est {id}",
             "XML",
-            "Suppression du document et de ses transactions associées. Retourne un flux XML avec statut DELETED et l'identifiant supprimé, ou ERROR si non trouvé."
+            "Suppression du document et de ses transactions associées. "
+                + "Retourne un flux XML avec statut DELETED et l'identifiant supprimé, ou ERROR si non trouvé."
         ));
 
         list.add(createEndpoint(

@@ -1,8 +1,14 @@
 package fr.univrouen.sepa26.dto;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import fr.univrouen.sepa26.model.Document;
-import jakarta.xml.bind.annotation.*;
-import com.fasterxml.jackson.dataformat.xml.annotation.*;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+
 import java.util.List;
 
 /**
@@ -20,7 +26,8 @@ public class DocumentList {
     @JacksonXmlElementWrapper(useWrapping = false)
     private List<Document> documents;
 
-    public DocumentList() {}
+    public DocumentList() {
+    }
 
     public DocumentList(List<Document> documents) {
         this.documents = documents;

@@ -24,7 +24,7 @@ import java.util.Optional;
 @Service
 public class SepaService {
 
-    private static final Logger log = LoggerFactory.getLogger(SepaService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SepaService.class);
 
     private final DocumentRepository repository;
     private final XmlValidationService xmlValidationService;
@@ -60,11 +60,13 @@ public class SepaService {
             }
             if (doc.getCstmrDrctDbtInitn().getPmtInfs() != null) {
                 for (Document.PmtInf pmt : doc.getCstmrDrctDbtInitn().getPmtInfs()) {
-                    if (pmt.getDrctDbtTxInfs() == null) continue;
+                    if (pmt.getDrctDbtTxInfs() == null) {
+                        continue;
+                    }
                     for (Document.DrctDbtTxInf tx : pmt.getDrctDbtTxInfs()) {
                         String pmtId = tx.getPmtId();
                         if (pmtId != null && exists(pmtId)) {
-                            log.warn("Doublon détecté pour le PmtId: {}", pmtId);
+                            LOG.warn("Doublon détecté pour le PmtId: {}", pmtId);
                             return null;
                         }
                     }
@@ -72,7 +74,7 @@ public class SepaService {
             }
             return repository.save(doc);
         } catch (Exception e) {
-            log.error("Erreur lors de la sauvegarde du document", e);
+            LOG.error("Erreur lors de la sauvegarde du document", e);
             return null;
         }
     }

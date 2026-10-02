@@ -109,7 +109,7 @@ footer {
 
 
 .liste-transaction {
-	list-style: decimal;
+    list-style: decimal;
     margin: 20px auto;
     padding: 15px 30px;
     background-color: #f9f9f9;
@@ -125,19 +125,19 @@ footer {
 }
 
 .montant {
-	font-weight: bold;
-	font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    font-family: 'Courier New', Courier, monospace;
 }
 
 .non-normalise {
-	color: red;
-	text-decoration: underline;
+    color: red;
+    text-decoration: underline;
 }
 
 .sub-section {
-	margin-top: 15px;
+    margin-top: 15px;
 }
 
 .sub-section h3 {
-	margin-bottom: 8px;
+    margin-bottom: 8px;
 }

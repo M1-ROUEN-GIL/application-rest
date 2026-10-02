@@ -24,7 +24,7 @@ import java.io.StringReader;
 @Service
 public class XmlValidationServiceImpl implements XmlValidationService {
 
-    private static final Logger log = LoggerFactory.getLogger(XmlValidationServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(XmlValidationServiceImpl.class);
     private static final String SCHEMA_PATH = "xml/sepa26.xsd";
 
     private final Schema schema;
@@ -33,9 +33,9 @@ public class XmlValidationServiceImpl implements XmlValidationService {
         try {
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             this.schema = schemaFactory.newSchema(new ClassPathResource(SCHEMA_PATH).getURL());
-            log.info("Schéma XSD chargé avec succès : {}", SCHEMA_PATH);
+            LOG.info("Schéma XSD chargé avec succès : {}", SCHEMA_PATH);
         } catch (Exception e) {
-            log.error("Impossible de charger le schéma XSD : {}", SCHEMA_PATH, e);
+            LOG.error("Impossible de charger le schéma XSD : {}", SCHEMA_PATH, e);
             throw new IllegalStateException("Erreur d'initialisation du schéma XSD " + SCHEMA_PATH, e);
         }
     }
@@ -58,7 +58,7 @@ public class XmlValidationServiceImpl implements XmlValidationService {
             return ValidationResult.success();
         } catch (Exception e) {
             String errorMsg = "Erreur de validation XSD : " + e.getMessage();
-            log.warn("Échec de la validation XML : {}", e.getMessage());
+            LOG.warn("Échec de la validation XML : {}", e.getMessage());
             return ValidationResult.error(errorMsg);
         }
     }

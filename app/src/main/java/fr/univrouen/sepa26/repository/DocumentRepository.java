@@ -46,9 +46,9 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
      * @return La liste des documents correspondant aux critères, vide sinon.
      */
     @Query("SELECT d FROM Document d " +
-    		"JOIN d.cstmrDrctDbtInitn i " +
-    		"JOIN i.grpHdr g " +
-    		"WHERE (:date IS NULL OR g.creDtTm >= :date) " +
-    		"AND (:sum IS NULL OR g.ctrlSum >= :sum)")
+            "JOIN d.cstmrDrctDbtInitn i " +
+            "JOIN i.grpHdr g " +
+            "WHERE (:date IS NULL OR g.creDtTm >= :date) " +
+            "AND (:sum IS NULL OR g.ctrlSum >= :sum)")
     List<Document> search(@Param("date") LocalDateTime date, @Param("sum") Double sum);
 }

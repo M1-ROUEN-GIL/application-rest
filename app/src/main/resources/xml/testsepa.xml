@@ -60,10 +60,10 @@
         </p:DrctDbtTx>
         <p:DbtrAgt>
           <p:FinInstnId>
-			<p:Othr>
-				<p:Id>NOTPROVIDED</p:Id>
-			</p:Othr>
-			</p:FinInstnId>
+            <p:Othr>
+                <p:Id>NOTPROVIDED</p:Id>
+            </p:Othr>
+            </p:FinInstnId>
         </p:DbtrAgt>
         <p:Dbtr>
           <p:Nm>Mr Debiteur N1</p:Nm>

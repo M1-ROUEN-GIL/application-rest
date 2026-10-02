@@ -21,16 +21,16 @@ import java.io.StringWriter;
 @Service
 public class XmlSerializationServiceImpl implements XmlSerializationService {
 
-    private static final Logger log = LoggerFactory.getLogger(XmlSerializationServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(XmlSerializationServiceImpl.class);
 
     private final JAXBContext jaxbContext;
 
     public XmlSerializationServiceImpl() {
         try {
             this.jaxbContext = JAXBContext.newInstance(Document.class);
-            log.info("JAXBContext initialisé pour Document.class");
+            LOG.info("JAXBContext initialisé pour Document.class");
         } catch (JAXBException e) {
-            log.error("Échec de l'initialisation de JAXBContext", e);
+            LOG.error("Échec de l'initialisation de JAXBContext", e);
             throw new IllegalStateException("Impossible d'initialiser JAXBContext", e);
         }
     }
@@ -49,7 +49,7 @@ public class XmlSerializationServiceImpl implements XmlSerializationService {
             marshaller.marshal(document, writer);
             return writer.toString();
         } catch (JAXBException e) {
-            log.error("Erreur lors de la sérialisation XML du document", e);
+            LOG.error("Erreur lors de la sérialisation XML du document", e);
             return "<error>" + e.getMessage() + "</error>";
         }
     }
@@ -67,7 +67,7 @@ public class XmlSerializationServiceImpl implements XmlSerializationService {
         } catch (Exception e) {
             String message = (e.getMessage() != null) ? e.getMessage() : e.toString();
             String errorMsg = "Erreur de parsing XML (JAXB) : " + message;
-            log.warn("Échec du parsing XML : {}", errorMsg);
+            LOG.warn("Échec du parsing XML : {}", errorMsg);
             return ParseResult.error(errorMsg);
         }
     }
