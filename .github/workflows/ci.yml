@@ -7,15 +7,40 @@ on:
     branches: [ main, master ]
 
 jobs:
-  build-and-test:
-    name: Build & Test (Java 25)
+  lint:
+    name: Code Quality & Lint (Checkstyle)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Java 25 (Temurin)
+      - name: Set up Java 25 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '25'
+          cache: 'maven'
+
+      - name: Run Checkstyle linter
+        run: mvn -B checkstyle:check
+
+  build-and-test:
+    name: Build & Test (Java 25)
+    needs: lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 25 (Temurin)
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -31,11 +56,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: actions/setup-buildx-action@v3
 
       - name: Build Docker Image
-        run: docker build -t sepa26-app:latest .
+        run: docker build -t sepa26-app:latest ./app

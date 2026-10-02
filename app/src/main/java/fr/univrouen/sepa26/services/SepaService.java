@@ -24,7 +24,7 @@ import java.util.Optional;
 @Service
 public class SepaService {
 
-    private static final Logger log = LoggerFactory.getLogger(SepaService);
+    private static final Logger log = LoggerFactory.getLogger(SepaService.class);
 
     private final DocumentRepository repository;
     private final XmlValidationService xmlValidationService;

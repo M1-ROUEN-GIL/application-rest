@@ -4,6 +4,15 @@ Service Spring Boot de gestion, validation XSD et transformation XSLT de viremen
 
 ---
 
+## Structure du projet
+
+- `app/` : Application Spring Boot (sources Java, templates Thymeleaf, schémas XML/XSD, configuration Checkstyle et Dockerfile).
+- `doc/` : Rapport technique LaTeX et PDF.
+- `docker-compose.yml` : Orchestration de l'application (`sepa26-app`) et de MariaDB.
+- `.github/workflows/` : Pipeline d'intégration continue (linting, tests et build Docker).
+
+---
+
 ## Démarrage rapide
 
 ### Avec Docker Compose (Recommandé)
@@ -11,19 +20,6 @@ Lance l'application Spring Boot (`sepa26-app`) et la base de données MariaDB :
 
 ```bash
 docker compose up --build
-```
-
-L'application est disponible sur : **[http://localhost:8100/](http://localhost:8100/)**
-
-### En local avec Maven
-Prérequis : Java 25 et Maven.
-
-```bash
-# Lancement des tests
-mvn test
-
-# Démarrage de l'application
-mvn spring-boot:run
 ```
 
 ---
@@ -55,4 +51,4 @@ Les paramètres par défaut sont définis dans `.env.example` et `.env` :
 
 ## Licence
 
-Projet sous licence MIT &mdash; voir [LICENSE.md](LICENSE.md).
+Projet sous [LICENSE.md](LICENSE.md).

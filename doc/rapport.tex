@@ -127,12 +127,32 @@ L'architecture du projet repose sur un découpage en couches étanches, complét
     \item \textbf{Génération uniforme des erreurs :} Un formatage réutilisable des messages d'erreur évite l'éparpillement de chaînes XML codées en dur.
 \end{itemize}
 
+\subsection{Organisation du Dépôt \& Arborescence}
+
+Afin d'isoler nettement les outils d'infrastructure du code source applicatif, le dépôt est structuré comme suit :
+\begin{itemize}[leftmargin=*]
+    \item \textbf{\texttt{app/}} : Application Spring Boot autonome :
+    \begin{itemize}
+        \item \texttt{src/main/java/} : Code source Java (contrôleurs, services, entités, DTOs).
+        \item \texttt{src/main/resources/} : Configuration, templates Thymeleaf, CSS et ressources XML/XSD/XSLT.
+        \item \texttt{src/test/} : Suites de tests unitaires et d'intégration.
+        \item \texttt{pom.xml} : Descripteur Maven de dépendances et de plugins.
+        \item \texttt{checkstyle.xml} : Règles de conformité et d'analyse statique du code (linter).
+        \item \texttt{Dockerfile} : Fichier de build multi-stage de l'image Docker.
+    \end{itemize}
+    \item \textbf{\texttt{doc/}} : Documentation technique et sources LaTeX du présent rapport.
+    \item \textbf{\texttt{docker-compose.yml}} : Orchestration locale des conteneurs applicatif et base de données.
+    \item \textbf{\texttt{.env} \& \texttt{.env.example}} : Paramètres de configuration et variables d'environnement.
+    \item \textbf{\texttt{.github/workflows/}} : Pipeline d'Intégration Continue (GitHub Actions).
+\end{itemize}
+
 \subsection{Stack Technique}
 
 \begin{itemize}
     \item \textbf{Langage :} Java 25 (LTS).
     \item \textbf{Framework :} Spring Boot 4.1.1 (Spring Web, Spring Data JPA).
     \item \textbf{Gestion des dépendances \& Build :} Apache Maven.
+    \item \textbf{Qualité de code \& Linter :} Maven Checkstyle Plugin 3.6.0.
     \item \textbf{Base de données :} MariaDB 11 en production / Docker, et H2 Database en mémoire pour l'exécution des tests.
     \item \textbf{Traitement XML :} Jakarta XML Binding (JAXB 4.0), Saxon-HE 12.9 (moteur XSLT 3.0), Jackson XML.
     \item \textbf{Moteur de rendu Web :} Thymeleaf.
@@ -215,9 +235,9 @@ La configuration de l'infrastructure est externalisée via des fichiers d'enviro
 
 Un workflow GitHub Actions automatisé (\texttt{.github/workflows/ci.yml}) valide l'intégrité du code à chaque \textit{push} et \textit{pull request} :
 \begin{enumerate}
-    \item Mise en place de l'environnement Java 25 (distribution Temurin) avec cache Maven.
-    \item Exécution des suites de tests unitaires et d'intégration (\texttt{mvn clean test}).
-    \item Vérification de la construction de l'image Docker multi-stage (\texttt{docker build}).
+    \item \textbf{Vérification de la qualité du code (Checkstyle) :} Exécution du linter (\texttt{mvn checkstyle:check}) pour garantir l'absence d'imports non utilisés, le respect des conventions de nommage et la lisibilité du code selon les règles Clean Code.
+    \item \textbf{Compilation et tests (Build \& Test) :} Mise en place de Java 25 (Temurin) avec cache Maven et exécution intégrale des suites de tests unitaires et d'intégration (\texttt{mvn clean test}).
+    \item \textbf{Validation du conteneur (Docker Build) :} Vérification automatisée de la construction de l'image Docker multi-stage à partir du contexte \texttt{app/} (\texttt{docker build -t sepa26-app:latest ./app}).
 \end{enumerate}
 
 \newpage

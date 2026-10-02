@@ -9,8 +9,8 @@ RUN apk add --no-cache maven
 
 WORKDIR /build
 
-# Copie des fichiers sources et du pom.xml
-COPY pom.xml .
+# Copie des fichiers sources, configuration checkstyle et pom.xml
+COPY pom.xml checkstyle.xml* ./
 COPY src ./src
 
 # Compilation de l'exécutable Spring Boot
