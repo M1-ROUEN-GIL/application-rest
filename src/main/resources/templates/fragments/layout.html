@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+    <!-- Barre de navigation commune -->
+    <nav th:fragment="nav">
+        <ul>
+            <li><a th:href="@{/}">Accueil</a></li>
+            <li><a th:href="@{/help}">Page d'aide</a></li>
+            <li><a th:href="@{/sepa26/resume/html}">Résumé des flux (HTML)</a></li>
+            <li><a th:href="@{/sepa26/resume/xml}">Résumé des flux (XML)</a></li>
+            <li><a th:href="@{/transfert}">Transfert</a></li>
+        </ul>
+    </nav>
+
+    <!-- Pied de page commun -->
+    <footer th:fragment="footer">
+        <p>&copy; 2026 Université de Rouen Normandie &mdash; Master 1 GIL</p>
+    </footer>
+
+</body>
+</html>

@@ -1,13 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta charset="UTF-8">
-    <title>Erreur</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erreur - SEPA26</title>
+    <link rel="stylesheet" th:href="@{/sepa26.css}">
 </head>
 <body>
-    <h1>Une erreur est survenue</h1>
-    <p>La page demandée n'existe pas ou une erreur s'est produite.</p>
-    <a href="/">Retour à l'accueil</a>
+
+    <!-- Barre de navigation -->
+    <div th:replace="~{fragments/layout :: nav}"></div>
+
+    <main class="container">
+        <div class="error-card">
+            <div class="error-code" style="color: var(--warning-color);">!</div>
+            <h2>Une erreur est survenue</h2>
+            <p>La page demandée n'a pas pu être traitée correctement.</p>
+            <p style="margin-top: 25px;">
+                <a th:href="@{/}" class="btn">Retour à l'accueil</a>
+                <a th:href="@{/help}" class="btn btn-secondary">Consulter l'aide de l'API</a>
+            </p>
+        </div>
+    </main>
+
+    <!-- Pied de page -->
+    <div th:replace="~{fragments/layout :: footer}"></div>
+
 </body>
 </html>

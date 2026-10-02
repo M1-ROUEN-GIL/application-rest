@@ -29,34 +29,35 @@
 \pagestyle{plain}
 
 \begin{titlepage}
-    
     \centering
 
     \includegraphics[width=0.3\textwidth]{univ_rouen.jpg}
 
     \vspace{2cm}
     
-    {Master 1 GIL - XML \\ \textcolor{red}{Projet : Service REST \& Compléments}}
+    {\Large Master 1 GIL --- Technologies XML \\ \textcolor{blue!70!black}{\textbf{Projet : Service REST SEPA (ISO 20022) \& Déploiement Conteneurisé}}}
 
     \vspace{2cm}
     
     \begin{center}
         \rule{\textwidth}{1.5pt}
-        \vskip 1cm
-        {\huge\bfseries RAPPORT MINI PROJET}
-        \vskip 1cm
+        \vskip 0.8cm
+        {\huge\bfseries RAPPORT TECHNIQUE DE PROJET}
+        \vskip 0.8cm
         \rule{\textwidth}{1.5pt}
     \end{center}
     
     \vspace{2cm}
     
-\fbox{%
-    \begin{minipage}{12cm}
-        Version: \textcolor{red}{1.0}\\\\
-        Date: \textcolor{red}{15/04/2026}\\\\
-        Rédigé par: \textcolor{red}{Umm-Habibah Ouattara et Florian Pépin}\\
-    \end{minipage}%
-}
+    \fbox{%
+        \begin{minipage}{12cm}
+            \textbf{Projet :} SEPA26 --- Service REST ISO 20022\\
+            \textbf{Version :} 1.0.0\\
+            \textbf{Date :} Octobre 2026\\
+            \textbf{Auteurs :} Umm-Habibah Ouattara \& Florian Pépin\\
+            \textbf{Technologies :} Spring Boot 4.1.1, Java 25 LTS, Docker, MariaDB
+        \end{minipage}%
+    }
 
 \end{titlepage}
 
@@ -68,210 +69,225 @@
 
 \section{Introduction}
 
-Ce projet porte sur la réalisation du service REST SEPA26. L'objectif est de construire une architecture basé sur la norme ISO 20022 fourni en cours pour gérer des transactions. Le déploiement est automatisé sur une VM via Jenkins.
+Ce projet a pour objectif la conception et l'implémentation d'un service web REST complet dédié à la gestion, la validation et la restitution de transactions de prélèvement bancaire SEPA, basées sur la norme internationale \textbf{ISO 20022} (\texttt{pain.008.001.02}).
 
-\section{Identification du Projet}
+Le service permet l'ingestion de messages XML, leur validation stricte selon un schéma XML Schema (XSD), leur stockage persistant dans une base relationnelle, leur recherche multicritères, ainsi que leur restitution sous forme de flux XML structurés ou de vues HTML conviviales transformées par feuilles de style XSLT 3.0.
+
+L'application a été entièrement conçue selon les principes de \textbf{Clean Code} (\textbf{SOLID} et \textbf{DRY}) et s'accompagne d'une infrastructure moderne et autonome basée sur \textbf{Docker}, \textbf{Docker Compose} et un pipeline d'Intégration Continue (\textbf{GitHub Actions}).
+
+\section{Contexte et Objectifs}
 
 \begin{itemize}
-    \item \textbf{Étudiants :} Umm-Habibah Ouattara et Florian Pépin
-    \item \textbf{Nom de la VM :} \texttt{vm-pepinflo-xml.univ-rouen.fr}
-    \item \textbf{Adresse IP :} \texttt{10.130.162.188}
-    \item \textbf{URL de l'application :} \url{http://10.130.162.188:8100/}
+    \item \textbf{Cadre académique :} Master 1 Génie de l'Informatique Logicielle (GIL) --- Université de Rouen Normandie.
+    \item \textbf{Norme métier :} Format XML ISO 20022 pour les prélèvements SEPA directs (\textit{Customer Direct Debit Initiation}).
+    \item \textbf{Exigences de qualité logicielle :}
+    \begin{itemize}
+        \item Séparation stricte des responsabilités (Single Responsibility Principle).
+        \item Inversion des dépendances et découplage via interfaces (Dependency Inversion Principle).
+        \item Élimination de la duplication de code (Don't Repeat Yourself).
+        \item Déploiement portable, reproductible et sans adhérence à une machine ou à un serveur externe.
+    \end{itemize}
 \end{itemize}
 
 \newpage
 
-\section{Architecture du Projet}
+\section{Architecture Logicielle \& Principes de Conception}
 
-L'application est structurée selon un modèle classique en couches (Layered Architecture), garantissant une séparation claire des responsabilités.
+L'architecture du projet repose sur un découpage en couches étanches, complété par des services spécialisés à responsabilité unique.
 
-\subsection{Organisation Logicielle}
-L'application suit une architecture en couches, dont voici les responsabilités principales :
-\begin{itemize}
-    \item \textbf{Couche de Présentation (Web/API) :} Gère les requêtes HTTP via les contrôleurs et assure le rendu des vues.
-    \item \textbf{Couche de Service :} Centralise la logique métier et les règles de gestion.
-    \item \textbf{Couche d'Accès aux Données :} Assure la persistance via Spring Data JPA.
-    \item \textbf{DTO \& Utilitaires :} Facilitent le transfert de données et les transformations XML/XSLT.
+\subsection{Application des Principes SOLID}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Single Responsibility Principle (SRP) :} 
+    La logique XML n'est pas mélangée à la persistance ni aux contrôleurs. 
+    \begin{itemize}
+        \item \texttt{XmlValidationService} est l'unique responsable de la validation XSD.
+        \item \texttt{XmlSerializationService} est l'unique responsable de la conversion bidirectionnelle JAXB.
+        \item \texttt{XsltTransformationService} est dédié aux transformations XSLT vers HTML.
+        \item \texttt{EndpointDocumentationService} encapsule les métadonnées de documentation de l'API.
+        \item \texttt{SepaApiController} traite exclusivement les flux de données REST (XML), tandis que \texttt{SepaWebController} pilote l'interface utilisateur web (HTML Thymeleaf).
+    \end{itemize}
+
+    \item \textbf{Open/Closed Principle (OCP) \& Liskov Substitution (LSP) :}
+    Tous les services clés sont définis à travers des interfaces Java. Les implémentations peuvent évoluer ou être substituées sans impacter les contrôleurs ou les consommateurs métier.
+
+    \item \textbf{Interface Segregation Principle (ISP) :}
+    Les interfaces de service sont granulaires et ciblées, évitant aux clients de dépendre de méthodes superflues.
+
+    \item \textbf{Dependency Inversion Principle (DIP) :}
+    L'injection par champ (\texttt{@Autowired} sur attributs privés) a été bannie au profit exclusif de \textbf{l'injection par constructeur} avec des attributs \texttt{final}. Cela garantit l'immutabilité des composants et facilite grandement l'isolation lors des tests unitaires sans nécessiter de contexte Spring complexe.
 \end{itemize}
 
-\subsubsection{Détail des composants principaux}
-\begin{longtable}{|l|p{10cm}|}
-    \hline
-    \textbf{Classe / Composant} & \textbf{Rôle et Responsabilité} \\
-    \hline
-    \endfirsthead
-    \hline
-    \textbf{Classe / Composant} & \textbf{Rôle et Responsabilité} \\
-    \hline
-    \endhead
-    \texttt{Sepa26Application} & Point d'entrée principal qui démarre l'application Spring Boot. \\ \hline
-    \texttt{SepaService} & Centralise la logique métier et coordonne les opérations sur les transactions. \\ \hline
-    \texttt{Document} & Entité représentant une transaction SEPA et sa structure en base de données. \\ \hline
-    \texttt{DocumentRepository} & Interface assurant le lien entre l'application et la base de données MariaDB. \\ \hline
-    \texttt{GetController} & Gère la récupération et l'affichage des transactions (XML et HTML). \\ \hline
-    \texttt{PostController} & Traite l'insertion de nouvelles transactions et les demandes de suppression. \\ \hline
-    \texttt{SearchController} & Propose des fonctionnalités de recherche multicritères sur les transactions. \\ \hline
-    \texttt{IndexController} & Gère la navigation vers la page d'accueil et la documentation d'aide. \\ \hline
-    \texttt{TransfertController} & Fournit l'interface pour l'importation de fichiers XML par l'utilisateur. \\ \hline
-    \texttt{XsltTransformer} & Transforme les données XML brutes en pages HTML lisibles via des feuilles XSLT. \\ \hline
-    \texttt{DocumentList} & DTO utilisé pour formater une collection de documents dans les réponses XML. \\ \hline
-    \texttt{SepaResponse} & Structure standardisée pour les messages de retour (succès/erreur) de l'API. \\ \hline
-    \texttt{DataInitializer} & Initialise la persistance avec des données de test lors du démarrage du serveur. \\ \hline
-\end{longtable}
+\subsection{Application du Principe DRY (Don't Repeat Yourself)}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Mise en cache des ressources lourdes :} L'instance de schéma XSD (\texttt{Schema}) et le contexte JAXB (\texttt{JAXBContext}) sont pré-instanciés une seule fois au démarrage de l'application, évitant de recharger et parser les schémas à chaque requête HTTP.
+    \item \textbf{Templating modulaire Thymeleaf :} La barre de navigation et le pied de page sont factorisés dans un composant unique (\texttt{fragments/layout.html}) et réutilisés dans toutes les pages de l'application.
+    \item \textbf{Centralisation CSS :} Tous les styles de l'application sont centralisés dans \texttt{sepa26.css} avec des variables CSS, évitant toute duplication de règles CSS inlinées.
+    \item \textbf{Génération uniforme des erreurs :} Un formatage réutilisable des messages d'erreur évite l'éparpillement de chaînes XML codées en dur.
+\end{itemize}
 
 \subsection{Stack Technique}
-Le service repose sur une stack Java 21 moderne et robuste :
+
 \begin{itemize}
-    \item \textbf{Framework :} Spring Boot (Spring Web, Spring Data JPA).
-    \item \textbf{Gestion des dépendances :} Maven.
-    \item \textbf{Stockage :} MariaDB (Production) et H2 (Tests).
-    \item \textbf{Traitement XML :} JAXB, Jackson-XML et Saxon-HE (XSLT/XPath).
-    \item \textbf{Interface :} Thymeleaf pour le rendu des vues HTML dynamiques.
+    \item \textbf{Langage :} Java 25 (LTS).
+    \item \textbf{Framework :} Spring Boot 4.1.1 (Spring Web, Spring Data JPA).
+    \item \textbf{Gestion des dépendances \& Build :} Apache Maven.
+    \item \textbf{Base de données :} MariaDB 11 en production / Docker, et H2 Database en mémoire pour l'exécution des tests.
+    \item \textbf{Traitement XML :} Jakarta XML Binding (JAXB 4.0), Saxon-HE 12.9 (moteur XSLT 3.0), Jackson XML.
+    \item \textbf{Moteur de rendu Web :} Thymeleaf.
+    \item \textbf{Conteneurisation \& CI :} Docker, Docker Compose, GitHub Actions.
 \end{itemize}
 
-\subsection{Points d'accès (Endpoints)}
-Le tableau suivant récapitule l'ensemble des points d'entrée du service (API REST et Interface Web) accessibles sous le préfixe \texttt{/sepa26} :
+\newpage
+
+\section{Points d'Accès de l'Application}
+
+L'application expose ses fonctionnalités à travers deux vecteurs complémentaires : l'API REST ISO 20022 (\texttt{SepaApiController}) et l'IHM Web interactive (\texttt{SepaWebController}).
 
 \begin{table}[h]
     \centering
     \small
-    \begin{tabularx}{\textwidth}{|l|l|X|}
+    \begin{tabularx}{\textwidth}{|l|l|l|X|}
         \hline
-        \textbf{Méthode} & \textbf{Endpoint} & \textbf{Description / Format de sortie} \\
+        \textbf{Méthode} & \textbf{Endpoint} & \textbf{Format} & \textbf{Description} \\
         \hline
-        \texttt{GET} & \texttt{/} & Page d'accueil du service \\
+        \texttt{GET} & \texttt{/} & HTML & Page d'accueil du service \\
         \hline
-        \texttt{GET} & \texttt{/help} & Page d'aide et documentation de l'API \\
+        \texttt{GET} & \texttt{/help} & HTML & Documentation interactive des points d'accès \\
         \hline
-        \texttt{GET} & \texttt{/transfert} & Interface d'importation de fichiers XML \\
+        \texttt{GET} & \texttt{/transfert} & HTML & Formulaire d'importation et validation de flux XML \\
         \hline
-        \texttt{POST} & \texttt{/insert} & Création d'un virement (Flux XML ISO 20022) \\
+        \texttt{GET} & \texttt{/sepa26/resume/html} & HTML & Tableau de bord des 10 dernières transactions \\
         \hline
-        \texttt{DELETE} & \texttt{/delete/\{id\}} & Suppression d'une transaction (Retour XML) \\
+        \texttt{GET} & \texttt{/sepa26/resume/xml} & XML & Synthèse XML des 10 derniers documents \\
         \hline
-        \texttt{GET} & \texttt{/resume/xml} & Liste de toutes les transactions (XML) \\
+        \texttt{GET} & \texttt{/sepa26/xml/\{id\}} & XML & Fiche complète du document SEPA \\
         \hline
-        \texttt{GET} & \texttt{/resume/html} & Liste de toutes les transactions (HTML) \\
+        \texttt{GET} & \texttt{/sepa26/html/\{id\}} & HTML & Rendu stylisé du document via feuille XSLT \\
         \hline
-        \texttt{GET} & \texttt{/xml/\{id\}} & Détail complet d'une transaction (XML) \\
+        \texttt{POST} & \texttt{/sepa26/insert} & XML & Insertion d'un flux SEPA (validation XSD) \\
         \hline
-        \texttt{GET} & \texttt{/html/\{id\}} & Détail complet d'une transaction (HTML) \\
+        \texttt{DELETE} & \texttt{/sepa26/delete/\{id\}} & XML & Suppression d'une transaction \\
         \hline
-        \texttt{GET} & \texttt{/search} & Recherche avancée multicritères (XML) \\
-        \hline
-    \end{tabularx}
-    \caption{Récapitulatif des services et pages web}
-\end{table}
-
-\newpage
-
-\section{Répartition du Travail}
-Le développement du projet a été équitablement réparti entre les deux membres du binôme. Le tableau ci-dessous détaille la distribution des modules selon les sections du cahier des charges :
-
-\begin{table}[h]
-    \centering
-    \begin{tabularx}{\textwidth}{|l|X|}
-        \hline
-        \textbf{Développeur} & \textbf{Modules et Tâches réalisées} \\
-        \hline
-        \textbf{Florian Pépin} & 
-        \begin{itemize}[leftmargin=*]
-            \item Développement des contrôleurs principaux (Accueil I.1, Aide I.2, Résumés I.3, Détails I.4 et Insertion I.5).
-            \item Bonus : Gestion optimisée des messages d'erreurs (II.1).
-            \item Infrastructure : Mise en place de la persistance (Base de données II.3).
-        \end{itemize} \\
-        \hline
-        \textbf{Umm-Habibah Ouattara} & 
-        \begin{itemize}[leftmargin=*]
-            \item Mise en œuvre des contraintes du service et validation XSD (I.6).
-            \item Développement de l'API de recherche (II.2).
-            \item Qualité : Tests d'intégration et création de la collection Postman (II.3).
-            \item Outil : Développement de l'application de transfert de flux (III.1).
-        \end{itemize} \\
+        \texttt{GET} & \texttt{/sepa26/search} & XML & Recherche multicritères (date, montant) \\
         \hline
     \end{tabularx}
-    \caption{Répartition détaillée des tâches}
+    \caption{Synthèse des points d'accès de l'application SEPA26}
 \end{table}
 
-\newpage
+\section{Usine Logicielle, Conteneurisation \& CI/CD}
 
-\section{Description de l'usine logicielle}
+Pour garantir un déploiement fiable et reproductible sur n'importe quel environnement, le projet s'appuie sur une infrastructure conteneurisée complète.
 
-Afin d'assurer une livraison fluide et automatisée du service SEPA26, nous avons mis en place une usine logicielle complète intégrant l'Intégration Continue (CI) et le Déploiement Continu (CD).
+\subsection{Build Multi-Stage avec Docker}
 
-\subsection{Surveillance et Déclenchement}
-L'usine logicielle s'appuie sur une scrutation active (Polling SCM) du dépôt de gestion de version. Jenkins vérifie chaque minute (\texttt{* * * * *}) si de nouvelles modifications ont été apportées au code source. Si un changement est détecté, le cycle de build est automatiquement lancé.
+Le fichier \texttt{Dockerfile} adopte une approche multi-stage optimisant à la fois la sécurité et la légèreté de l'image finale :
+\begin{enumerate}
+    \item \textbf{Étape de compilation (Builder) :} S'appuie sur l'image \texttt{eclipse-temurin:25-jdk-alpine}. Elle intègre Maven, compile le code source et génère le fichier \texttt{sepa26server.jar}.
+    \item \textbf{Étape d'exécution (Runtime) :} S'appuie sur l'image minimale \texttt{eclipse-temurin:25-jre-alpine}. Seul le fichier binaire produit y est copié. L'application est exécutée sous un utilisateur non-privilégié (\texttt{spring:spring}) pour une sécurité renforcée.
+\end{enumerate}
 
-\subsection{Chaîne de Build et Automatisation}
-Le processus est orchestré par un \texttt{Jenkinsfile} (Pipeline) structuré en plusieurs étapes clés :
+L'image produite est baptisée \texttt{sepa26-app:latest}.
 
+\subsection{Orchestration Locale avec Docker Compose}
+
+Le fichier \texttt{docker-compose.yml} orchestre les deux services nécessaires au fonctionnement complet du projet :
 \begin{itemize}
-    \item \textbf{Préparation :} Initialisation de l'environnement, création d'un réseau Docker dédié (\texttt{sepa-network}) pour isoler les communications et nettoyage des anciens conteneurs.
-    \item \textbf{Gestion des Données (MariaDB) :} Lancement automatique d'un conteneur MariaDB. La persistance est assurée par un volume Docker et les accès sont sécurisés via l'utilisation des \textit{Credentials} Jenkins pour masquer les mots de passe.
-    \item \textbf{Compilation et Packaging (Maven) :} Exécution de la commande \texttt{mvn package} qui assure la compilation, le passage des tests unitaires et d'intégration, et la génération de l'artefact exécutable.
-    \item \textbf{Conteneurisation (Docker) :} Construction de l'image Docker de l'application intégrant l'artefact généré.
-    \item \textbf{Déploiement :} Lancement du conteneur applicatif sur le port \texttt{8100}, lié dynamiquement à la base de données MariaDB via les variables d'environnement.
+    \item \textbf{Service \texttt{db} :} Conteneur MariaDB 11 avec volume persistant (\texttt{mariadb\_data}) et contrôle de santé (\textit{healthcheck}).
+    \item \textbf{Service \texttt{app} :} Conteneur applicatif \texttt{sepa26-app} exposé sur le port \texttt{8100}, démarré automatiquement une fois la base de données saine et prête à recevoir des connexions.
 \end{itemize}
 
-\subsection{Sécurité et Isolation}
-L'architecture de l'usine logicielle privilégie la sécurité :
+Le lancement s'effectue en une commande unique :
+\begin{center}
+    \texttt{docker compose up --build}
+\end{center}
+
+\subsection{Gestion des Variables d'Environnement}
+
+La configuration de l'infrastructure est externalisée via des fichiers d'environnement :
 \begin{itemize}
-    \item \textbf{Secrets :} Aucun mot de passe n'est stocké en clair dans les scripts ; Jenkins injecte dynamiquement les secrets au moment de l'exécution.
-    \item \textbf{Réseau :} L'utilisation d'un réseau Docker \textit{bridge} assure que seul le serveur applicatif est exposé à l'extérieur, la base de données n'étant accessible que par l'application au sein du réseau privé Docker.
+    \item \texttt{.env.example} : Modèle versionné décrivant les variables nécessaires (\texttt{SERVER\_PORT}, \texttt{DB\_URL}, \texttt{DB\_USER}, \texttt{DB\_PASSWORD}, \texttt{DB\_ROOT\_PASSWORD}).
+    \item \texttt{.env} : Fichier de configuration local, ignoré par Git pour préserver la confidentialité des paramètres.
 \end{itemize}
 
-\newpage
+\subsection{Pipeline d'Intégration Continue (GitHub Actions)}
 
-\subsection{Maintenance et Redémarrage}
-Grâce à l'automatisation via Jenkins et Docker, le redémarrage ou la mise à jour du service est simplifié :
-\begin{itemize}
-    \item \textbf{Redémarrage via Jenkins :} Une simple action \textit{"Lancer un build"} sur l'interface Jenkins suffit à déclencher le pipeline complet. Le script se charge de stopper les instances existantes, de recompiler le code et de relancer proprement les conteneurs MariaDB et SEPA26.
-    \item \textbf{Redémarrage manuel :} En cas de besoin, il est également possible de redémarrer le service manuellement sur la VM via les commandes Docker (\texttt{docker restart servicesepa26}).
-\end{itemize}
-
-\newpage
-
-\section{Éléments Optionnels}
-Nous avons ajouté quelques fonctionnalités pour rendre le service plus simple à utiliser depuis un navigateur :
-
-\begin{itemize}
-    \item \textbf{Formulaire d'insertion :} Il est possible d'envoyer un fichier XML directement depuis la page \url{/transfert} sans avoir à passer par une commande \texttt{curl}.
-    \item \textbf{Bouton supprimer :} Sur la page des résumés (\url{/resume/html}), nous avons ajouté un bouton pour supprimer une transaction en un clic. C'est plus pratique que de forger une requête \texttt{DELETE} à la main.
-    \item \textbf{Collection Postman :} Nous avons fournit le fichier \texttt{sepa26\_pepin\_ouattara.json} qui contient déjà toutes les requêtes prêtes à l'emploi pour tester le serveur (VM).
-\end{itemize}
+Un workflow GitHub Actions automatisé (\texttt{.github/workflows/ci.yml}) valide l'intégrité du code à chaque \textit{push} et \textit{pull request} :
+\begin{enumerate}
+    \item Mise en place de l'environnement Java 25 (distribution Temurin) avec cache Maven.
+    \item Exécution des suites de tests unitaires et d'intégration (\texttt{mvn clean test}).
+    \item Vérification de la construction de l'image Docker multi-stage (\texttt{docker build}).
+\end{enumerate}
 
 \newpage
 
-\section{Identifiants et Accès aux Services}
-Cette section regroupe les identifiants nécessaires pour accéder aux différents outils de l'usine logicielle et tester le service.
+\appendix
+\section{Annexe : Catalogue Exhaustif des Classes et Composants}
 
-\subsection{Identifiants des utilisateurs (VM)}
-\begin{table}[h]
-    \centering
-    \begin{tabular}{|l|l|l|}
-        \hline
-        \textbf{Usage} & \textbf{Utilisateur} & \textbf{Mot de passe} \\
-        \hline
-        Admin & \texttt{spring} & \texttt{abcd1230} \\
-        \hline
-        Projet REST & \texttt{user-git} & \texttt{user-git} \\
-        \hline
-        Tests sur la VM & \texttt{test} & \texttt{test} \\
-        \hline
-    \end{tabular}
-    \caption{Identifiants de la VM}
-\end{table}
+Ce catalogue détaille l'ensemble des classes Java développées au sein du projet SEPA26, avec leur localisation, leur rôle et les principes de conception associés.
 
-\subsection{Accès Jenkins}
-\begin{itemize}
-    \item \textbf{URL :} \url{http://10.130.162.188:8080}
-    \item \textbf{Login :} \texttt{jobadmin}
-    \item \textbf{Mot de passe :} \texttt{JobAdmin26}
-\end{itemize}
+\begin{longtable}{|p{4.4cm}|p{3.2cm}|p{7.6cm}|}
+    \hline
+    \textbf{Classe / Interface} & \textbf{Package} & \textbf{Rôle et Responsabilité} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Classe / Interface} & \textbf{Package} & \textbf{Rôle et Responsabilité} \\
+    \hline
+    \endhead
 
-\subsection{Service REST SEPA26}
-\begin{itemize}
-    \item \textbf{Interface Web :} \url{http://10.130.162.188:8100/}
-\end{itemize}
+    \texttt{Sepa26Application} & \texttt{fr.univrouen.sepa26} & Point d'entrée exécutable démarrant le contexte Spring Boot. \\ \hline
+    
+    \texttt{SepaApiController} & \texttt{...controllers} & Contrôleur REST (\texttt{@RestController}) gérant tous les flux XML : consultation des résumés, détails, insertion validée, suppression et recherche. \\ \hline
+    
+    \texttt{SepaWebController} & \texttt{...controllers} & Contrôleur Web (\texttt{@Controller}) gérant les vues HTML Thymeleaf : accueil, documentation, transfert, tableau récapitulatif et transformation XSLT. \\ \hline
+    
+    \texttt{SepaService} & \texttt{...services} & Façade métier coordonnant la persistance, l'unicité des virements et les services de traitement XML. \\ \hline
+    
+    \texttt{XmlValidationService} & \texttt{...services} & Interface du service de validation des flux XML contre les schémas XSD. \\ \hline
+    
+    \texttt{XmlValidationServiceImpl} & \texttt{...services.impl} & Implémentation de la validation XSD avec mise en cache du schéma \texttt{sepa26.xsd} pour des performances optimales. \\ \hline
+    
+    \texttt{XmlSerializationService} & \texttt{...services} & Interface du service de sérialisation et désérialisation XML JAXB. \\ \hline
+    
+    \texttt{XmlSerializationServiceImpl} & \texttt{...services.impl} & Implémentation JAXB avec mise en cache du \texttt{JAXBContext} réutilisable. \\ \hline
+    
+    \texttt{XsltTransformationService} & \texttt{...services} & Interface de transformation de documents XML en rendu HTML via XSLT. \\ \hline
+    
+    \texttt{XsltTransformer} & \texttt{...util} & Implémentation du moteur Saxon-HE appliquant la feuille de style \texttt{sepa26.xslt}. \\ \hline
+    
+    \texttt{EndpointDocumentationService} & \texttt{...services} & Interface fournissant les métadonnées de documentation des points d'accès. \\ \hline
+    
+    \texttt{EndpointDocumentationServiceImpl} & \texttt{...services.impl} & Implémentation fournissant la liste descriptive des 10 endpoints pour la page d'aide. \\ \hline
+    
+    \texttt{DocumentRepository} & \texttt{...repository} & Interface Spring Data JPA assurant les opérations de persistance, de recherche multicritère et de filtrage par PmtId. \\ \hline
+    
+    \texttt{DataInitializer} & \texttt{...init} & Composant \texttt{CommandLineRunner} injectant deux documents SEPA types au démarrage si la base est vide. \\ \hline
+    
+    \texttt{Document} & \texttt{...model} & Entité racine JPA et JAXB représentant le document ISO 20022 complet. \\ \hline
+    
+    \texttt{CstmrDrctDbtInitn} & \texttt{...model.Document} & Sous-entité encapsulant le bloc d'initiation du prélèvement. \\ \hline
+    
+    \texttt{GrpHdr} & \texttt{...model.Document} & Entité d'en-tête de lot (identifiant de message, date, somme de contrôle, nombre d'opérations). \\ \hline
+    
+    \texttt{PmtInf} & \texttt{...model.Document} & Entité d'information de paiement regroupant les informations créancier et les transactions. \\ \hline
+    
+    \texttt{DrctDbtTxInf} & \texttt{...model.Document} & Entité de transaction élémentaire (débiteur, montant, mandat, compte). \\ \hline
+    
+    \texttt{ValidationResult} & \texttt{...dto} & Record immutable contenant l'état de validation XSD et le message d'erreur éventuel. \\ \hline
+    
+    \texttt{ParseResult<T>} & \texttt{...dto} & Record générique encapsulant le résultat d'une désérialisation XML JAXB. \\ \hline
+    
+    \texttt{SepaResponse} & \texttt{...dto} & DTO de réponse XML standardisé pour les opérations de modification (\texttt{INSERTED}, \texttt{DELETED}, \texttt{ERROR}). \\ \hline
+    
+    \texttt{DocumentList} & \texttt{...dto} & DTO conteneur XML pour la sérialisation des listes de documents. \\ \hline
+    
+    \texttt{SearchResponse} & \texttt{...dto} & DTO de réponse pour la recherche multicritères (\texttt{OK}, \texttt{NONE}, \texttt{ERROR}). \\ \hline
+    
+    \texttt{LocalDateAdapter} & \texttt{...util} & Adaptateur JAXB assurant la conversion entre les dates ISO (\texttt{YYYY-MM-DD}) et \texttt{LocalDate}. \\ \hline
+    
+    \texttt{LocalDateTimeAdapter} & \texttt{...util} & Adaptateur JAXB assurant la conversion des horodatages ISO (\texttt{YYYY-MM-DD'T'HH:mm:ss}) et \texttt{LocalDateTime}. \\ \hline
+\end{longtable}
 
 \end{document}

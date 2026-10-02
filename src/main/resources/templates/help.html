@@ -5,79 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aide - Projet SEPA26</title>
     <link rel="stylesheet" th:href="@{/sepa26.css}">
-    <style>
-        .endpoint {
-            background-color: white;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            padding: 15px;
-        }
-        .endpoint h2 {
-            color: #333;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-            margin-top: 0;
-        }
-        .endpoint-details {
-            display: grid;
-            grid-template-columns: 150px 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .endpoint-details dt {
-            font-weight: bold;
-            color: #555;
-        }
-        .endpoint-details dd {
-            margin-left: 0;
-        }
-        .description {
-            background-color: #f9f9f9;
-            padding: 10px;
-            border-radius: 4px;
-            border-left: 4px solid #4CAF50;
-        }
-    </style>
 </head>
 <body>
-	<nav>
-        <ul>
-            <li><a th:href="@{/help}">Page d'aide</a></li>
-            <li><a th:href="@{/sepa26/resume/html}">Résumé des flux (HTML)</a></li>
-            <li><a th:href="@{/sepa26/resume/xml}">Résumé des flux (XML)</a></li>
-            <li><a th:href="@{/transfert}">Transfert</a></li>
-        </ul>
-    </nav>
+
+    <!-- Barre de navigation -->
+    <div th:replace="~{fragments/layout :: nav}"></div>
     
     <header>
         <h1>Documentation du service REST SEPA26</h1>
-        <p><a th:href="@{/}">Retour à l'accueil</a></p>
+        <p><a th:href="@{/}">&larr; Retour à l'accueil</a></p>
     </header>
     
     <main class="container">
         <div th:each="endpoint : ${endpoints}" class="endpoint">
-        <h2 th:text="${endpoint['url']}">URL</h2>
+            <h2 th:text="${endpoint['url']}">/sepa26/endpoint</h2>
 
-        <dl class="endpoint-details">
-            <dt>Méthode</dt>
-            <dd th:text="${endpoint['method']}">GET</dd>
+            <dl class="endpoint-details">
+                <dt>Méthode :</dt>
+                <dd><strong th:text="${endpoint['method']}">GET</strong></dd>
 
-            <dt>Opération</dt>
-            <dd th:text="${endpoint['operation']}">Description de l'opération</dd>
+                <dt>Opération :</dt>
+                <dd th:text="${endpoint['operation']}">Description de l'opération</dd>
 
-            <dt>Format de retour</dt>
-            <dd th:text="${endpoint['return']}">Format de retour</dd>
-        </dl>
+                <dt>Format de retour :</dt>
+                <dd th:text="${endpoint['return']}">XML / HTML</dd>
+            </dl>
 
-        <div class="description" th:utext="${endpoint['description']}">
-            Description détaillée de l'endpoint...
+            <div class="description" th:utext="${endpoint['description']}">
+                Description détaillée de l'endpoint...
+            </div>
         </div>
-    </div>
     </main>
     
-    <footer>
-        <p>&copy; 2026 Université de Rouen Normandie</p>
-    </footer>
+    <!-- Pied de page -->
+    <div th:replace="~{fragments/layout :: footer}"></div>
+
 </body>
 </html>

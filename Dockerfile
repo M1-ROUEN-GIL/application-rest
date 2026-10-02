@@ -1,24 +1,34 @@
-## alpine Linux with JRE
-FROM eclipse-temurin:21-jre-alpine
+# ==============================================================================
+# Dockerfile Multi-Stage pour SEPA26 (Java 25 LTS & Spring Boot 4.1.1)
+# ==============================================================================
 
-## Set environnement JAVA
-ENV JAVA_HOME=/opt/java/openjdk
-ENV PATH="$PATH:$JAVA_HOME/bin"
+# Étape 1 : Compilation et packaging avec Maven et JDK 25
+FROM eclipse-temurin:25-jdk-alpine AS builder
 
-## create non root user and group
-RUN addgroup -S spring && adduser -S spring -G spring
+RUN apk add --no-cache maven
 
-## copy project
-ARG WAR_FILE=target/sepa26server.jar
-COPY ${WAR_FILE} /opt/sepa26server.jar
+WORKDIR /build
 
-## Set the nonroot user as default user
-USER spring:spring
+# Copie des fichiers sources et du pom.xml
+COPY pom.xml .
+COPY src ./src
 
-# choose working directory
+# Compilation de l'exécutable Spring Boot
+RUN mvn clean package -DskipTests
+
+# Étape 2 : Image d'exécution légère et sécurisée avec JRE 25
+FROM eclipse-temurin:25-jre-alpine
+
 WORKDIR /opt
 
-ENTRYPOINT ["java","-jar","sepa26server.jar"]
+# Création d'un utilisateur non-root dédié pour Spring Boot
+RUN addgroup -S spring && adduser -S spring -G spring
 
-## Expose the port
+# Copie du binaire produit depuis l'étape de compilation
+COPY --from=builder /build/target/sepa26server.jar /opt/sepa26server.jar
+
+USER spring:spring
+
 EXPOSE 8100
+
+ENTRYPOINT ["java", "-jar", "sepa26server.jar"]

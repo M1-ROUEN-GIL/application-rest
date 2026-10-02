@@ -3,176 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Importer un flux XML</title>
+    <title>Importer un flux XML - SEPA26</title>
     <link rel="stylesheet" th:href="@{/sepa26.css}">
-    <style>
-    	.form-container {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 20px;
-            margin: 20px auto;
-            max-width: 800px;
-        }
-
-		
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .form-group input[type="text"],
-        .form-group input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .form-group input[type="file"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: #f8f9fa;
-        }
-        .checkbox-group {
-		    display: flex;
-		    align-items: center;
-		    gap: 10px;
-		    margin-bottom: 15px;
-		}
-		
-		.checkbox-group label {
-		    display: inline !important;
-		    font-weight: normal;
-		    margin: 0;
-		}
-
-        .checkbox-group input[type="checkbox"] {
-            margin-right: 10px;
-        }
-        
-        input[type="checkbox"] {
-		    width: auto;
-		    margin-bottom: 0;
-		}
-
-        .btn {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-
-        .btn:hover {
-            background-color: #45a049;
-        }
-
-        .btn-secondary {
-            background-color: #f44336;
-        }
-
-        .btn-secondary:hover {
-            background-color: #d32f2f;
-        }
-
-        .response {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 4px;
-            display: none;
-        }
-
-        .success {
-            background-color: #dff0d8;
-            border: 1px solid #d6e9c6;
-            color: #3c763d;
-        }
-
-        .error {
-            background-color: #f2dede;
-            border: 1px solid #ebccd1;
-            color: #a94442;
-        }
-        pre {
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 10px;
-            white-space: pre-wrap;
-            font-family: monospace;
-            font-size: 14px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-    </style>
 </head>
 <body>
-	<nav>
-        <ul>
-            <li><a th:href="@{/help}">Page d'aide</a></li>
-            <li><a th:href="@{/sepa26/resume/html}">Résumé des flux (HTML)</a></li>
-            <li><a th:href="@{/sepa26/resume/xml}">Résumé des flux (XML)</a></li>
-            <li><a th:href="@{/transfert}">Transfert</a></li>
-        </ul>
-    </nav>
+
+    <!-- Barre de navigation -->
+    <div th:replace="~{fragments/layout :: nav}"></div>
+
     <header>
         <h1>Application de transfert SEPA</h1>
-        <p><a th:href="@{/}">Retour à l'accueil</a></p>
+        <p><a th:href="@{/}">&larr; Retour à l'accueil</a></p>
     </header>
     
     <main class="container">
-    	<div class="form-container">
-    		<form id="transferForm">
-	            <div class="form-group">
-	                <label for="serverUrl">URL du serveur:</label>
-	                <input type="text" id="serverUrl" value="http://10.130.162.188" required>
-	            </div>
-	
-	            <div class="form-group">
-	                <label for="serverPort">Port:</label>
-	                <input type="number" id="serverPort" value="8100" min="1" max="65535" required>
-	            </div>
-	
-	            <div class="form-group">
-	                <label for="endpoint">Endpoint:</label>
-	                <input type="text" id="endpoint" value="/sepa26/insert" required>
-	            </div>
-	
-	            <div class="form-group">
-	                <label for="xmlFile">Fichier XML:</label>
-	                <input type="file" id="xmlFile" accept=".xml" required>
-	            </div>
-				<div class="checkbox-group">
-				    <input type="checkbox" id="validateXml">
-				    <label for="validateXml">Valider le XML avant le transfert</label>
-				</div>
-	            <button type="submit" class="btn">Transférer</button>
-	            <button type="button" class="btn btn-secondary" id="resetBtn">Réinitialiser</button>
-	        </form>
-	
-	        <div id="response" class="response">
-	            <h3 id="responseTitle">Résultat</h3>
-	            <p id="responseMessage"></p>
-	            <pre id="responseDetails"></pre>
-	        </div>
-    	</div>
+        <div class="form-container">
+            <form id="transferForm">
+                <div class="form-group">
+                    <label for="serverUrl">URL du serveur :</label>
+                    <input type="text" id="serverUrl" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="serverPort">Port :</label>
+                    <input type="number" id="serverPort" value="8100" min="1" max="65535" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="endpoint">Endpoint cible :</label>
+                    <input type="text" id="endpoint" value="/sepa26/insert" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="xmlFile">Fichier XML SEPA :</label>
+                    <input type="file" id="xmlFile" accept=".xml" required>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="validateXml" checked>
+                    <label for="validateXml">Valider le XML contre le schéma XSD avant transfert</label>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn">Transférer le flux</button>
+                    <button type="button" class="btn btn-secondary" id="resetBtn">Réinitialiser</button>
+                </div>
+            </form>
+
+            <div id="response" class="response">
+                <h3 id="responseTitle">Résultat</h3>
+                <p id="responseMessage"></p>
+                <div id="responseDetails" class="response-details"></div>
+            </div>
+        </div>
     </main>
-    	
-    <footer>
-        <p>&copy; 2026 Université de Rouen Normandie</p>
-    </footer>
+    
+    <!-- Pied de page -->
+    <div th:replace="~{fragments/layout :: footer}"></div>
+
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.getElementById('transferForm');
@@ -187,7 +75,11 @@
         const responseMessage = document.getElementById('responseMessage');
         const responseDetails = document.getElementById('responseDetails');
 
-        // Check if we have XML from the conversion application
+        // Initialisation dynamique de l'URL du serveur
+        serverUrl.value = window.location.protocol + '//' + window.location.hostname;
+        serverPort.value = window.location.port || '8100';
+
+        // Détection d'un éventuel flux converti en session
         const urlParams = new URLSearchParams(window.location.search);
         const fromConvert = urlParams.get('fromConvert') === 'true';
         let convertedXml = null;
@@ -195,39 +87,30 @@
         if (fromConvert) {
             convertedXml = sessionStorage.getItem('convertedXml');
             if (convertedXml) {
-                // Show a message that we're using converted XML
                 showInfo('XML Converti', 'Utilisation du XML converti depuis l\'application de conversion. Vous pouvez maintenant le transférer vers le serveur.');
-
-                // Make the file input optional since we have XML from conversion
                 xmlFile.removeAttribute('required');
             }
         }
 
-        // Helper function to process and send XML
         function processAndSendXml(xml) {
-            // Validate XML if option is checked
             if (validateXml.checked) {
-                // Client-side validation using DOMParser
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(xml, 'text/xml');
-
-                // Check for parsing errors
                 const parserError = xmlDoc.getElementsByTagName('parsererror');
                 if (parserError.length > 0) {
-                    showError('Erreur de validation XML', 'Le fichier XML contient des erreurs de syntaxe.', parserError[0].textContent);
+                    showError('Erreur de syntaxe XML', 'Le fichier sélectionné n\'est pas un XML bien formé.', parserError[0].textContent);
                     return;
                 }
             }
 
-            // Construct the full URL
-            const b = validateXml.checked
-            const url = `${serverUrl.value}:${serverPort.value}${endpoint.value}?validate=${b}`;
+            const shouldValidate = validateXml.checked;
+            const url = `${serverUrl.value}:${serverPort.value}${endpoint.value}?validate=${shouldValidate}`;
 
-            // Send XML to server
             fetch(url, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/xml'
+                    'Content-Type': 'application/xml',
+                    'Accept': 'application/xml'
                 },
                 body: xml
             })
@@ -238,36 +121,31 @@
                 return res.text();
             })
             .then(data => {
-                // Parse XML response
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(data, 'text/xml');
-
                 const status = xmlDoc.getElementsByTagName('status')[0]?.textContent;
 
                 if (status === 'INSERTED') {
                     const id = xmlDoc.getElementsByTagName('id')[0]?.textContent;
-                    showSuccess('Succès', `Le flux a été transféré avec succès.`, `ID du document: ${id}\n\nRéponse complète:\n${data}`);
+                    showSuccess('Succès', `Le flux a été inséré avec succès. Identifiant créé : ${id}`, data);
                 } else {
-                    const message = xmlDoc.getElementsByTagName('message')[0]?.textContent || 'Une erreur est survenue.';
-                    showError('Erreur', message, `Réponse complète:\n${data}`);
+                    const desc = xmlDoc.getElementsByTagName('description')[0]?.textContent || 'Une erreur est survenue lors de l\'insertion.';
+                    showError('Erreur d\'insertion', desc, data);
                 }
             })
             .catch(err => {
-                showError('Erreur de communication', 'Une erreur est survenue lors de la communication avec le serveur.', err.toString());
+                showError('Erreur de communication', 'Impossible de communiquer avec le serveur.', err.toString());
             });
         }
 
-        // Handle form submission
         form.addEventListener('submit', function(e) {
             e.preventDefault();
 
-            // If we have converted XML, use it
             if (convertedXml) {
                 processAndSendXml(convertedXml);
                 return;
             }
 
-            // Otherwise, use the file input
             if (!xmlFile.files || xmlFile.files.length === 0) {
                 showError('Erreur', 'Veuillez sélectionner un fichier XML.');
                 return;
@@ -277,24 +155,23 @@
             const reader = new FileReader();
 
             reader.onload = function(e) {
-                const xml = e.target.result;
-                processAndSendXml(xml);
+                processAndSendXml(e.target.result);
             };
 
             reader.onerror = function() {
-                showError('Erreur de lecture', 'Impossible de lire le fichier XML.');
+                showError('Erreur de lecture', 'Impossible de lire le fichier XML local.');
             };
 
             reader.readAsText(file);
         });
 
-        // Reset form
         resetBtn.addEventListener('click', function() {
             form.reset();
+            serverUrl.value = window.location.protocol + '//' + window.location.hostname;
+            serverPort.value = window.location.port || '8100';
             response.style.display = 'none';
         });
 
-        // Helper functions
         function showSuccess(title, message, details = '') {
             responseTitle.textContent = title;
             responseMessage.textContent = message;
@@ -319,7 +196,6 @@
             response.style.display = 'block';
         }
     });
-</script>
-    
+    </script>
 </body>
 </html>

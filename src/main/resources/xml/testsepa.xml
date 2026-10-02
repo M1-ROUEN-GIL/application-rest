@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:Document xmlns:p="http://univ.fr/sepa26" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://univ.fr/sepa26 sepa26.tp1.xsd ">
+<p:Document xmlns:p="http://univ.fr/sepa26" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://univ.fr/sepa26 sepa26.xsd">
   <p:CstmrDrctDbtInitn>
     <p:GrpHdr>
       <p:MsgId>MSGID - 123456</p:MsgId>

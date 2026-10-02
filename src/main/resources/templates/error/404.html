@@ -3,11 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error 404 (Not Found)!</title>
+    <title>Page non trouvée (404) - SEPA26</title>
+    <link rel="stylesheet" th:href="@{/sepa26.css}">
 </head>
 <body>
-    <p><b>404.</b> <ins>That’s an error.</ins></p>
-    <p>L'URL demandée n'a pas été trouvée.</p>
-    <p><a href="/">Retour à l'accueil</a></p>
+
+    <!-- Barre de navigation -->
+    <div th:replace="~{fragments/layout :: nav}"></div>
+
+    <main class="container">
+        <div class="error-card">
+            <div class="error-code">404</div>
+            <h2>Page non trouvée</h2>
+            <p>La ressource demandée n'existe pas ou a été déplacée.</p>
+            <p style="margin-top: 25px;">
+                <a th:href="@{/}" class="btn">Retour à l'accueil</a>
+                <a th:href="@{/help}" class="btn btn-secondary">Consulter l'aide de l'API</a>
+            </p>
+        </div>
+    </main>
+
+    <!-- Pied de page -->
+    <div th:replace="~{fragments/layout :: footer}"></div>
+
 </body>
 </html>

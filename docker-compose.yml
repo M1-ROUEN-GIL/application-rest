@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  db:
+    image: mariadb:11
+    container_name: sepa26-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_password}
+      MYSQL_DATABASE: sepa26_db
+      MYSQL_USER: ${DB_USER:-sepa_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-sepa_password}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    image: sepa26-app:latest
+    container_name: sepa26-app
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-8100}:8100"
+    environment:
+      SERVER_PORT: 8100
+      DB_URL: jdbc:mariadb://db:3306/sepa26_db
+      DB_USER: ${DB_USER:-sepa_user}
+      DB_PASSWORD: ${DB_PASSWORD:-sepa_password}
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  mariadb_data:

@@ -16,8 +16,12 @@ import java.time.LocalDateTime;
 @Component
 public class DataInitializer implements CommandLineRunner {
 
+    private final SepaService sepaService;
+
     @Autowired
-    private SepaService sepaService;
+    public DataInitializer(SepaService sepaService) {
+        this.sepaService = sepaService;
+    }
 
     @Override
     public void run(String... args) throws Exception {
