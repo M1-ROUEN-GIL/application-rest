@@ -5,8 +5,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -144,8 +148,9 @@ public class WebLayerTest {
                 .andReturn();
         
         String responseBody = insertResult.getResponse().getContentAsString();
-        String idStr = responseBody.replaceAll(".*<id>(\\d+)</id>.*", "$1");
-        long id = Long.parseLong(idStr);
+        Matcher matcher = Pattern.compile("<id>(\\d+)</id>").matcher(responseBody);
+        assertTrue(matcher.find(), "ID should be present in response: " + responseBody);
+        long id = Long.parseLong(matcher.group(1));
 
         // 2. Get Detail XML
         this.mockMvc.perform(get("/sepa26/xml/" + id).accept(MediaType.APPLICATION_XML))

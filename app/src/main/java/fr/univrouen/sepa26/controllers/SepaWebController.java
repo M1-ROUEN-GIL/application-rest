@@ -93,7 +93,7 @@ public class SepaWebController {
      */
     @GetMapping(value = "/sepa26/html/{id}", produces = MediaType.TEXT_HTML_VALUE)
     @ResponseBody
-    public String getHtmlDetail(@PathVariable long id) {
+    public String getHtmlDetail(@PathVariable("id") long id) {
         Optional<Document> doc = sepaService.getById(id);
         if (doc.isPresent()) {
             try {

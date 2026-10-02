@@ -67,7 +67,7 @@ public class SepaApiController {
      * @return Le Document sérialisé ou une SepaResponse ERROR
      */
     @GetMapping(value = "/xml/{id}", produces = MediaType.APPLICATION_XML_VALUE)
-    public Object getXmlDetail(@PathVariable long id) {
+    public Object getXmlDetail(@PathVariable("id") long id) {
         Optional<Document> doc = sepaService.getById(id);
         if (doc.isPresent()) {
             return doc.get();
@@ -119,7 +119,7 @@ public class SepaApiController {
      * @return SepaResponse DELETED ou ERROR
      */
     @DeleteMapping(value = "/delete/{id}", produces = MediaType.APPLICATION_XML_VALUE)
-    public SepaResponse delete(@PathVariable long id) {
+    public SepaResponse delete(@PathVariable("id") long id) {
         if (sepaService.delete(id)) {
             return new SepaResponse(id, "DELETED");
         }
@@ -135,8 +135,8 @@ public class SepaApiController {
      */
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<SearchResponse> search(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @RequestParam(required = false) Double sum) {
+            @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(value = "sum", required = false) Double sum) {
         try {
             LocalDateTime dateTime = (date != null) ? date.atStartOfDay() : null;
             List<Document> results = sepaService.search(dateTime, sum);

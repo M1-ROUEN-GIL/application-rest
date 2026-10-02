@@ -105,7 +105,7 @@ public class SepaService {
      * @return Liste de documents.
      */
     public List<Document> getLast10() {
-        return repository.findLast10();
+        return repository.findTop10ByOrderByIdDocDesc();
     }
 
     /**

@@ -29,15 +29,18 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             "JOIN p.pmtInfs pi " +
             "JOIN pi.drctDbtTxInfs t " +
             "WHERE t.pmtId = :pmtId")
-    Optional<Document> findByPmtId(String pmtId);
+    Optional<Document> findByPmtId(@Param("pmtId") String pmtId);
 
     /**
      * Récupère les 10 derniers documents enregistrés en base.
      *
      * @return Liste des 10 documents les plus récents.
      */
-    @Query(value = "SELECT * FROM documents ORDER BY document_id DESC LIMIT 10", nativeQuery = true)
-    List<Document> findLast10();
+    List<Document> findTop10ByOrderByIdDocDesc();
+
+    default List<Document> findLast10() {
+        return findTop10ByOrderByIdDocDesc();
+    }
     
     /**
      * Recherche des documents en fonction de critères de date et de montant.
