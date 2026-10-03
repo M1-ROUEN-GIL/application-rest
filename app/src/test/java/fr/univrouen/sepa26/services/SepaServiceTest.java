@@ -1,8 +1,14 @@
 package fr.univrouen.sepa26.services;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,7 +21,26 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import fr.univrouen.sepa26.model.Account;
+import fr.univrouen.sepa26.model.AccountId;
+import fr.univrouen.sepa26.model.AccountSchemeId;
+import fr.univrouen.sepa26.model.Agent;
+import fr.univrouen.sepa26.model.CstmrDrctDbtInitn;
 import fr.univrouen.sepa26.model.Document;
+import fr.univrouen.sepa26.model.DrctDbtTx;
+import fr.univrouen.sepa26.model.DrctDbtTxInf;
+import fr.univrouen.sepa26.model.FinInstnId;
+import fr.univrouen.sepa26.model.GrpHdr;
+import fr.univrouen.sepa26.model.InstdAmt;
+import fr.univrouen.sepa26.model.LocalInstrument;
+import fr.univrouen.sepa26.model.MndtRltdInf;
+import fr.univrouen.sepa26.model.OtherIdentification;
+import fr.univrouen.sepa26.model.Party;
+import fr.univrouen.sepa26.model.PaymentTypeInfo;
+import fr.univrouen.sepa26.model.PmtInf;
+import fr.univrouen.sepa26.model.PrivateId;
+import fr.univrouen.sepa26.model.SchemeName;
+import fr.univrouen.sepa26.model.ServiceLevel;
 import fr.univrouen.sepa26.repository.DocumentRepository;
 
 /**
@@ -31,123 +56,120 @@ public class SepaServiceTest {
     @InjectMocks
     private SepaService sepaService;
 
-    private Document validDoc;    
-    
+    private Document validDoc;
+
     @BeforeEach
     void setUp() {
         validDoc = new Document();
-        
-        Document.CstmrDrctDbtInitn initn = new Document.CstmrDrctDbtInitn();
+
+        CstmrDrctDbtInitn initn = new CstmrDrctDbtInitn();
         validDoc.setCstmrDrctDbtInitn(initn);
 
-        Document.GrpHdr grpHdr = new Document.GrpHdr();
+        GrpHdr grpHdr = new GrpHdr();
         grpHdr.setMsgId("MSG-UNIT-TEST");
         grpHdr.setCreDtTm(LocalDateTime.parse("2026-03-01T10:00:00"));
         grpHdr.setNbOfTxs(1);
         grpHdr.setCtrlSum(100.0);
-        Document.Party initgPty = new Document.Party();
+        Party initgPty = new Party();
         initgPty.setNm("Test Company");
         grpHdr.setInitgPty(initgPty);
         initn.setGrpHdr(grpHdr);
 
-        Document.PmtInf pmtInf = new Document.PmtInf();
+        PmtInf pmtInf = new PmtInf();
         pmtInf.setPmtInfId("PMT-UNIT-1");
         pmtInf.setNbOfTxs(1);
         pmtInf.setCtrlSum(100.0);
         pmtInf.setReqdColltnDt(LocalDate.parse("2026-03-10"));
-        
-        Document.PaymentTypeInfo pmtTpInf = new Document.PaymentTypeInfo();
-        Document.ServiceLevel sl = new Document.ServiceLevel();
-        Document.LocalInstrument li = new Document.LocalInstrument();
+
+        PaymentTypeInfo pmtTpInf = new PaymentTypeInfo();
+        ServiceLevel sl = new ServiceLevel();
+        LocalInstrument li = new LocalInstrument();
         li.setCd("SEPA");
         sl.setCd("SEPA");
         pmtTpInf.setLclInstrm(li);
         pmtTpInf.setSvcLvl(sl);
         pmtTpInf.setSeqTp("RCUR");
         pmtInf.setPmtTpInf(pmtTpInf);
-        
 
-        Document.Party cdtr = new Document.Party();
+        Party cdtr = new Party();
         cdtr.setNm("Creditor Company");
         pmtInf.setCdtr(cdtr);
 
-        Document.Account cdtrAcct = new Document.Account();
-        Document.AccountId cdtrAcctId = new Document.AccountId();
+        Account cdtrAcct = new Account();
+        AccountId cdtrAcctId = new AccountId();
         cdtrAcctId.setIban("FR7612345678901234567890123");
         cdtrAcct.setId(cdtrAcctId);
         pmtInf.setCdtrAcct(cdtrAcct);
 
-        Document.Agent cdtrAgt = new Document.Agent();
-        Document.FinInstnId finCdtr = new Document.FinInstnId();
+        Agent cdtrAgt = new Agent();
+        FinInstnId finCdtr = new FinInstnId();
         finCdtr.setBic("BANKFRPPXXX");
         cdtrAgt.setFinInstnId(finCdtr);
         pmtInf.setCdtrAgt(cdtrAgt);
-        
-        
-        Document.AccountSchemeId cdtrSchmeId = new Document.AccountSchemeId();
-        Document.AccountId prvtIdWrapper = new Document.AccountId();
-        Document.PrivateId prvtId = new Document.PrivateId();
-        Document.OtherIdentification othr = new Document.OtherIdentification();
+
+        AccountSchemeId cdtrSchmeId = new AccountSchemeId();
+        AccountId prvtIdWrapper = new AccountId();
+        PrivateId prvtId = new PrivateId();
+        OtherIdentification othr = new OtherIdentification();
         othr.setId("FR00ZZZ123456");
-        Document.SchemeName schmeNm = new Document.SchemeName();
+        SchemeName schmeNm = new SchemeName();
         schmeNm.setPrtry("SEPA");
         othr.setSchemeName(schmeNm);
         prvtId.setOthr(othr);
         prvtIdWrapper.setPrvtId(prvtId);
         cdtrSchmeId.setId(prvtIdWrapper);
         pmtInf.setCdtrSchmeId(cdtrSchmeId);
-        
 
-        Document.DrctDbtTxInf txInf = new Document.DrctDbtTxInf();
+        DrctDbtTxInf txInf = new DrctDbtTxInf();
         txInf.setPmtId("REF-UNIT-TEST");
 
-        Document.InstdAmt amt = new Document.InstdAmt();
+        InstdAmt amt = new InstdAmt();
         amt.setValue(100.0);
         amt.setCcy("EUR");
         txInf.setInstdAmt(amt);
 
-        Document.DrctDbtTx tx = new Document.DrctDbtTx();
-        Document.MndtRltdInf mndt = new Document.MndtRltdInf();
+        DrctDbtTx tx = new DrctDbtTx();
+        MndtRltdInf mndt = new MndtRltdInf();
         mndt.setMndtId("MANDAT-UNIT");
         mndt.setDtOfSgntr(LocalDate.parse("2026-03-01"));
         tx.setMndtRltdInf(mndt);
         txInf.setDrctDbtTx(tx);
 
-        Document.Agent dbtrAgt = new Document.Agent();
-        Document.FinInstnId finDbtr = new Document.FinInstnId();
+        Agent dbtrAgt = new Agent();
+        FinInstnId finDbtr = new FinInstnId();
         finDbtr.setBic("BANKDEFFXXX");
         dbtrAgt.setFinInstnId(finDbtr);
         txInf.setDbtrAgt(dbtrAgt);
 
-        Document.Party dbtr = new Document.Party();
+        Party dbtr = new Party();
         dbtr.setNm("Client Unitaire");
         txInf.setDbtr(dbtr);
 
-        Document.Account acct = new Document.Account();
-        Document.AccountId acctId = new Document.AccountId();
+        Account acct = new Account();
+        AccountId acctId = new AccountId();
         acctId.setIban("FR7612345678901234567890123");
         acct.setId(acctId);
         txInf.setDbtrAcct(acct);
-        
+
         txInf.setRmtInf("Facture Unitaire");
-        
+
         pmtInf.getDrctDbtTxInfs().add(txInf);
 
         initn.getPmtInfs().add(pmtInf);
     }
-    
+
     @Test
     void testValidateXSDRaw_Success() {
         String xml = sepaService.convertToXml(validDoc);
         assertTrue(sepaService.validateXSDRaw(xml));
     }
-    
+
     @Test
     void testValidateXSDRaw_Failure() {
         String invalidXml = "<Document xmlns=\"http://univ.fr/sepa26\"></Document>";
         assertFalse(sepaService.validateXSDRaw(invalidXml));
     }
-    
+
     @Test
     void testSave_Success() {
         when(repository.findByPmtId("REF-UNIT-TEST")).thenReturn(Optional.empty());
@@ -158,7 +180,7 @@ public class SepaServiceTest {
         assertNotNull(saved, "Le document sauvegardé ne devrait pas être null");
         verify(repository, times(1)).save(validDoc);
     }
-    
+
     @Test
     void testSave_DuplicateError() {
         when(repository.findByPmtId("REF-UNIT-TEST"))
@@ -191,26 +213,4 @@ public class SepaServiceTest {
         assertFalse(deleted);
         verify(repository, never()).deleteById(any());
     }
-    /*
-    @Test
-    void testValidateXSD_Success() {
-        assertTrue(sepaService.validateXSD(validDoc), "Le document devrait être valide selon le XSD");
-    }
-    @Test
-    void testValidateXSD_Failure() {
-        Document invalidDoc = new Document();
-        
-        //System.out.println(sepaService.convertToXml(invalidDoc));
-        
-        boolean valid = sepaService.validateXSD(invalidDoc);
-        assertFalse(valid, "Un document vide devrait être invalide");
-    }
-    @Test
-    void testPrintXml() {
-        String xml = sepaService.convertToXml(validDoc);
-        System.out.println("=== XML généré ===");
-        System.out.println(xml);
-        System.out.println("=================");
-    }
-   */
 }

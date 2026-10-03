@@ -1,13 +1,33 @@
 package fr.univrouen.sepa26.init;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import fr.univrouen.sepa26.model.Account;
+import fr.univrouen.sepa26.model.AccountId;
+import fr.univrouen.sepa26.model.AccountSchemeId;
+import fr.univrouen.sepa26.model.Agent;
+import fr.univrouen.sepa26.model.CstmrDrctDbtInitn;
 import fr.univrouen.sepa26.model.Document;
+import fr.univrouen.sepa26.model.DrctDbtTx;
+import fr.univrouen.sepa26.model.DrctDbtTxInf;
+import fr.univrouen.sepa26.model.FinInstnId;
+import fr.univrouen.sepa26.model.GrpHdr;
+import fr.univrouen.sepa26.model.InstdAmt;
+import fr.univrouen.sepa26.model.LocalInstrument;
+import fr.univrouen.sepa26.model.MndtRltdInf;
+import fr.univrouen.sepa26.model.OtherIdentification;
+import fr.univrouen.sepa26.model.Party;
+import fr.univrouen.sepa26.model.PaymentTypeInfo;
+import fr.univrouen.sepa26.model.PmtInf;
+import fr.univrouen.sepa26.model.PrivateId;
+import fr.univrouen.sepa26.model.SchemeName;
+import fr.univrouen.sepa26.model.ServiceLevel;
 import fr.univrouen.sepa26.services.SepaService;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 /**
  * Initialise la base de données avec 2 documents de test au démarrage de l'application.
@@ -37,27 +57,27 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     /**
-     * Crée le premier document avec 2 transactions
+     * Crée le premier document avec 2 transactions.
      */
     private void createDocument1() {
         Document doc = new Document();
 
-        Document.CstmrDrctDbtInitn initn = new Document.CstmrDrctDbtInitn();
+        CstmrDrctDbtInitn initn = new CstmrDrctDbtInitn();
         doc.setCstmrDrctDbtInitn(initn);
 
         // Header
-        Document.GrpHdr grpHdr = new Document.GrpHdr();
+        GrpHdr grpHdr = new GrpHdr();
         grpHdr.setMsgId("MSG-INIT-001");
         grpHdr.setCreDtTm(LocalDateTime.now());
         grpHdr.setNbOfTxs(2);
         grpHdr.setCtrlSum(600.0);
-        Document.Party initgPty = new Document.Party();
+        Party initgPty = new Party();
         initgPty.setNm("Societe A");
         grpHdr.setInitgPty(initgPty);
         initn.setGrpHdr(grpHdr);
 
         // Payment Info
-        Document.PmtInf pmtInf = createPaymentInfo("PMT-INIT-001");
+        PmtInf pmtInf = createPaymentInfo("PMT-INIT-001");
 
         // TX 1
         pmtInf.getDrctDbtTxInfs().add(createTransaction(
@@ -85,27 +105,27 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     /**
-     * Crée le deuxième document avec 2 transactions
+     * Crée le deuxième document avec 2 transactions.
      */
     private void createDocument2() {
         Document doc = new Document();
 
-        Document.CstmrDrctDbtInitn initn = new Document.CstmrDrctDbtInitn();
+        CstmrDrctDbtInitn initn = new CstmrDrctDbtInitn();
         doc.setCstmrDrctDbtInitn(initn);
 
         // Header
-        Document.GrpHdr grpHdr = new Document.GrpHdr();
+        GrpHdr grpHdr = new GrpHdr();
         grpHdr.setMsgId("MSG-INIT-002");
         grpHdr.setCreDtTm(LocalDateTime.now());
         grpHdr.setNbOfTxs(2);
         grpHdr.setCtrlSum(1000.0);
-        Document.Party initgPty = new Document.Party();
+        Party initgPty = new Party();
         initgPty.setNm("Societe B");
         grpHdr.setInitgPty(initgPty);
         initn.setGrpHdr(grpHdr);
 
         // Payment Info
-        Document.PmtInf pmtInf = createPaymentInfo("PMT-INIT-002");
+        PmtInf pmtInf = createPaymentInfo("PMT-INIT-002");
 
         // TX 1
         pmtInf.getDrctDbtTxInfs().add(createTransaction(
@@ -132,43 +152,43 @@ public class DataInitializer implements CommandLineRunner {
         sepaService.save(doc);
     }
 
-    private Document.PmtInf createPaymentInfo(String pmtInfId) {
-        Document.PmtInf pmtInf = new Document.PmtInf();
+    private PmtInf createPaymentInfo(String pmtInfId) {
+        PmtInf pmtInf = new PmtInf();
         pmtInf.setPmtInfId(pmtInfId);
         pmtInf.setReqdColltnDt(LocalDate.now().plusDays(7));
 
-        Document.PaymentTypeInfo pmtTpInf = new Document.PaymentTypeInfo();
-        Document.ServiceLevel sl = new Document.ServiceLevel();
+        PaymentTypeInfo pmtTpInf = new PaymentTypeInfo();
+        ServiceLevel sl = new ServiceLevel();
         sl.setCd("SEPA");
-        Document.LocalInstrument li = new Document.LocalInstrument();
+        LocalInstrument li = new LocalInstrument();
         li.setCd("SEPA");
         pmtTpInf.setSvcLvl(sl);
         pmtTpInf.setLclInstrm(li);
         pmtTpInf.setSeqTp("RCUR");
         pmtInf.setPmtTpInf(pmtTpInf);
 
-        Document.Party cdtr = new Document.Party();
+        Party cdtr = new Party();
         cdtr.setNm("Creancier INIT");
         pmtInf.setCdtr(cdtr);
 
-        Document.Account cdtrAcct = new Document.Account();
-        Document.AccountId cdtrAcctId = new Document.AccountId();
+        Account cdtrAcct = new Account();
+        AccountId cdtrAcctId = new AccountId();
         cdtrAcctId.setIban("FR7612345678901234567890123");
         cdtrAcct.setId(cdtrAcctId);
         pmtInf.setCdtrAcct(cdtrAcct);
 
-        Document.Agent cdtrAgt = new Document.Agent();
-        Document.FinInstnId finCdtr = new Document.FinInstnId();
+        Agent cdtrAgt = new Agent();
+        FinInstnId finCdtr = new FinInstnId();
         finCdtr.setBic("BANKFRPPXXX");
         cdtrAgt.setFinInstnId(finCdtr);
         pmtInf.setCdtrAgt(cdtrAgt);
 
-        Document.AccountSchemeId cdtrSchmeId = new Document.AccountSchemeId();
-        Document.AccountId prvtIdWrapper = new Document.AccountId();
-        Document.PrivateId prvtId = new Document.PrivateId();
-        Document.OtherIdentification othr = new Document.OtherIdentification();
+        AccountSchemeId cdtrSchmeId = new AccountSchemeId();
+        AccountId prvtIdWrapper = new AccountId();
+        PrivateId prvtId = new PrivateId();
+        OtherIdentification othr = new OtherIdentification();
         othr.setId("FR00ZZZ123456");
-        Document.SchemeName schmeNm = new Document.SchemeName();
+        SchemeName schmeNm = new SchemeName();
         schmeNm.setPrtry("SEPA");
         othr.setSchemeName(schmeNm);
         prvtId.setOthr(othr);
@@ -179,40 +199,40 @@ public class DataInitializer implements CommandLineRunner {
         return pmtInf;
     }
 
-    private Document.DrctDbtTxInf createTransaction(
+    private DrctDbtTxInf createTransaction(
             String pmtId,
             String amount,
             String debtorName,
             String debtorIban,
             String mandateId) {
 
-        Document.DrctDbtTxInf txInf = new Document.DrctDbtTxInf();
+        DrctDbtTxInf txInf = new DrctDbtTxInf();
         txInf.setPmtId(pmtId);
 
-        Document.InstdAmt amt = new Document.InstdAmt();
+        InstdAmt amt = new InstdAmt();
         amt.setValue(Double.parseDouble(amount));
         amt.setCcy("EUR");
         txInf.setInstdAmt(amt);
 
-        Document.DrctDbtTx tx = new Document.DrctDbtTx();
-        Document.MndtRltdInf mndt = new Document.MndtRltdInf();
+        DrctDbtTx tx = new DrctDbtTx();
+        MndtRltdInf mndt = new MndtRltdInf();
         mndt.setMndtId(mandateId);
         mndt.setDtOfSgntr(LocalDate.now().minusMonths(1));
         tx.setMndtRltdInf(mndt);
         txInf.setDrctDbtTx(tx);
 
-        Document.Agent dbtrAgt = new Document.Agent();
-        Document.FinInstnId finDbtr = new Document.FinInstnId();
+        Agent dbtrAgt = new Agent();
+        FinInstnId finDbtr = new FinInstnId();
         finDbtr.setBic("BANKDEFFXXX");
         dbtrAgt.setFinInstnId(finDbtr);
         txInf.setDbtrAgt(dbtrAgt);
 
-        Document.Party dbtr = new Document.Party();
+        Party dbtr = new Party();
         dbtr.setNm(debtorName);
         txInf.setDbtr(dbtr);
 
-        Document.Account acct = new Document.Account();
-        Document.AccountId acctId = new Document.AccountId();
+        Account acct = new Account();
+        AccountId acctId = new AccountId();
         acctId.setIban(debtorIban);
         acct.setId(acctId);
         txInf.setDbtrAcct(acct);

@@ -3,6 +3,8 @@ package fr.univrouen.sepa26.services;
 import fr.univrouen.sepa26.dto.ParseResult;
 import fr.univrouen.sepa26.dto.ValidationResult;
 import fr.univrouen.sepa26.model.Document;
+import fr.univrouen.sepa26.model.DrctDbtTxInf;
+import fr.univrouen.sepa26.model.PmtInf;
 import fr.univrouen.sepa26.repository.DocumentRepository;
 import fr.univrouen.sepa26.services.impl.XmlSerializationServiceImpl;
 import fr.univrouen.sepa26.services.impl.XmlValidationServiceImpl;
@@ -59,11 +61,11 @@ public class SepaService {
                 return null;
             }
             if (doc.getCstmrDrctDbtInitn().getPmtInfs() != null) {
-                for (Document.PmtInf pmt : doc.getCstmrDrctDbtInitn().getPmtInfs()) {
+                for (PmtInf pmt : doc.getCstmrDrctDbtInitn().getPmtInfs()) {
                     if (pmt.getDrctDbtTxInfs() == null) {
                         continue;
                     }
-                    for (Document.DrctDbtTxInf tx : pmt.getDrctDbtTxInfs()) {
+                    for (DrctDbtTxInf tx : pmt.getDrctDbtTxInfs()) {
                         String pmtId = tx.getPmtId();
                         if (pmtId != null && exists(pmtId)) {
                             LOG.warn("Doublon détecté pour le PmtId: {}", pmtId);

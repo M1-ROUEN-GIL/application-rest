@@ -1,7 +1,11 @@
 package fr.univrouen.sepa26.services.impl;
 
 import fr.univrouen.sepa26.dto.ParseResult;
+import fr.univrouen.sepa26.model.CstmrDrctDbtInitn;
 import fr.univrouen.sepa26.model.Document;
+import fr.univrouen.sepa26.model.DrctDbtTxInf;
+import fr.univrouen.sepa26.model.GrpHdr;
+import fr.univrouen.sepa26.model.PmtInf;
 import fr.univrouen.sepa26.services.XmlSerializationService;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -27,8 +31,14 @@ public class XmlSerializationServiceImpl implements XmlSerializationService {
 
     public XmlSerializationServiceImpl() {
         try {
-            this.jaxbContext = JAXBContext.newInstance(Document.class);
-            LOG.info("JAXBContext initialisé pour Document.class");
+            this.jaxbContext = JAXBContext.newInstance(
+                Document.class,
+                CstmrDrctDbtInitn.class,
+                GrpHdr.class,
+                PmtInf.class,
+                DrctDbtTxInf.class
+            );
+            LOG.info("JAXBContext initialisé pour Document et ses entités associées");
         } catch (JAXBException e) {
             LOG.error("Échec de l'initialisation de JAXBContext", e);
             throw new IllegalStateException("Impossible d'initialiser JAXBContext", e);

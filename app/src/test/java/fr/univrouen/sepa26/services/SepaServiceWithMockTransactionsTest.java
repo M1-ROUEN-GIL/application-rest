@@ -1,8 +1,15 @@
 package fr.univrouen.sepa26.services;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
@@ -15,6 +22,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import fr.univrouen.sepa26.TestDocumentBuilder;
 import fr.univrouen.sepa26.model.Document;
+import fr.univrouen.sepa26.model.DrctDbtTxInf;
+import fr.univrouen.sepa26.model.GrpHdr;
+import fr.univrouen.sepa26.model.PmtInf;
 import fr.univrouen.sepa26.repository.DocumentRepository;
 
 /**
@@ -44,14 +54,14 @@ public class SepaServiceWithMockTransactionsTest {
         assertNotNull(docWithTwoTxs.getCstmrDrctDbtInitn(), "L'initialisation ne devrait pas être null");
         assertEquals(1, docWithTwoTxs.getCstmrDrctDbtInitn().getPmtInfs().size(), "Devrait avoir 1 paiement");
 
-        Document.PmtInf pmtInf = docWithTwoTxs.getCstmrDrctDbtInitn().getPmtInfs().get(0);
+        PmtInf pmtInf = docWithTwoTxs.getCstmrDrctDbtInitn().getPmtInfs().get(0);
         assertEquals(2, pmtInf.getDrctDbtTxInfs().size(), "Devrait avoir 2 transactions");
     }
 
     @Test
     void testFirstTransactionData() {
-        Document.PmtInf pmtInf = docWithTwoTxs.getCstmrDrctDbtInitn().getPmtInfs().get(0);
-        Document.DrctDbtTxInf tx1 = pmtInf.getDrctDbtTxInfs().get(0);
+        PmtInf pmtInf = docWithTwoTxs.getCstmrDrctDbtInitn().getPmtInfs().get(0);
+        DrctDbtTxInf tx1 = pmtInf.getDrctDbtTxInfs().get(0);
 
         assertEquals("REF-MOCK-TX-001", tx1.getPmtId(), "ID de paiement 1");
         assertEquals(250.0, tx1.getInstdAmt().getValue(), "Montant TX1");
@@ -62,8 +72,8 @@ public class SepaServiceWithMockTransactionsTest {
 
     @Test
     void testSecondTransactionData() {
-        Document.PmtInf pmtInf = docWithTwoTxs.getCstmrDrctDbtInitn().getPmtInfs().get(0);
-        Document.DrctDbtTxInf tx2 = pmtInf.getDrctDbtTxInfs().get(1);
+        PmtInf pmtInf = docWithTwoTxs.getCstmrDrctDbtInitn().getPmtInfs().get(0);
+        DrctDbtTxInf tx2 = pmtInf.getDrctDbtTxInfs().get(1);
 
         assertEquals("REF-MOCK-TX-002", tx2.getPmtId(), "ID de paiement 2");
         assertEquals(250.0, tx2.getInstdAmt().getValue(), "Montant TX2");
@@ -74,7 +84,7 @@ public class SepaServiceWithMockTransactionsTest {
 
     @Test
     void testHeaderSummary() {
-        Document.GrpHdr grpHdr = docWithTwoTxs.getCstmrDrctDbtInitn().getGrpHdr();
+        GrpHdr grpHdr = docWithTwoTxs.getCstmrDrctDbtInitn().getGrpHdr();
         assertEquals(2, grpHdr.getNbOfTxs(), "Nombre de transactions dans le header");
         assertEquals(500.0, grpHdr.getCtrlSum(), "Somme de contrôle totale (250 + 250)");
     }
