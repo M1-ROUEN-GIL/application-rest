@@ -37,7 +37,7 @@
 
     \vspace{2cm}
     
-    {\Large Master 1 GIL --- Technologies XML \\ \textcolor{blue!70!black}{\textbf{Projet : Service REST SEPA (ISO 20022) \& Déploiement Conteneurisé}}}
+    {\Large Master 1 GIL --- Technologies XML \\ \textcolor{blue!70!black}{\textbf{Projet : Service REST SEPA (ISO 20022) et Déploiement Conteneurisé}}}
 
     \vspace{2cm}
     
@@ -56,7 +56,7 @@
             \textbf{Projet :} SEPA26 --- Service REST ISO 20022\\
             \textbf{Version :} 1.0.0\\
             \textbf{Date :} Octobre 2026\\
-            \textbf{Auteurs :} Umm-Habibah Ouattara \& Florian Pépin\\
+            \textbf{Auteurs :} Umm-Habibah Ouattara et Florian Pépin\\
             \textbf{Technologies :} Spring Boot 4.1.1, Java 25 LTS, Docker, MariaDB
         \end{minipage}%
     }
@@ -77,27 +77,11 @@ Le service permet l'ingestion de messages XML, leur validation stricte selon un 
 
 L'application s'accompagne d'une infrastructure moderne et autonome basée sur \textbf{Docker}, \textbf{Docker Compose} et un pipeline d'Intégration Continue (\textbf{GitHub Actions}).
 
-\section{Contexte et Objectifs}
-
-\begin{itemize}[leftmargin=*]
-    \item \textbf{Cadre académique :} Master 1 Génie de l'Informatique Logicielle (GIL) --- Université de Rouen Normandie.
-    \item \textbf{Norme métier :} Format XML ISO 20022 pour les prélèvements SEPA directs (\textit{Customer Direct Debit Initiation}).
-    \item \textbf{Exigences de qualité logicielle :}
-    \begin{itemize}
-        \item Séparation stricte des responsabilités entre couches applicatives.
-        \item Inversion des dépendances et découplage via interfaces Java.
-        \item Élimination de la duplication de code et mutualisation des composants.
-        \item Déploiement portable, reproductible et sans adhérence à une machine ou à un serveur externe.
-    \end{itemize}
-\end{itemize}
-
-\newpage
-
-\section{Organisation du Projet \& Stack Technique}
+\section{Organisation du Projet et Stack Technique}
 
 Le projet repose sur une séparation nette entre le code applicatif et les descripteurs d'infrastructure, garantissant un environnement modulaire, maintenable et immédiatement opérationnel.
 
-\subsection{Organisation du Dépôt \& Arborescence}
+\subsection{Organisation du Dépôt et Arborescence}
 
 Afin d'isoler nettement les outils d'infrastructure du code source applicatif, le dépôt est structuré comme suit :
 \begin{itemize}[leftmargin=*]
@@ -112,7 +96,7 @@ Afin d'isoler nettement les outils d'infrastructure du code source applicatif, l
     \end{itemize}
     \item \textbf{\texttt{doc/}} : Documentation technique et sources LaTeX du présent rapport.
     \item \textbf{\texttt{docker-compose.yml}} : Orchestration locale des conteneurs applicatif et base de données.
-    \item \textbf{\texttt{.env} \& \texttt{.env.example}} : Paramètres de configuration et variables d'environnement.
+    \item \textbf{\texttt{.env} et \texttt{.env.example}} : Paramètres de configuration et variables d'environnement.
     \item \textbf{\texttt{.github/workflows/}} : Pipeline d'Intégration Continue (GitHub Actions).
 \end{itemize}
 
@@ -121,12 +105,12 @@ Afin d'isoler nettement les outils d'infrastructure du code source applicatif, l
 \begin{itemize}[leftmargin=*]
     \item \textbf{Langage :} Java 25 (LTS).
     \item \textbf{Framework :} Spring Boot 4.1.1 (Spring Web, Spring Data JPA).
-    \item \textbf{Gestion des dépendances \& Build :} Apache Maven.
-    \item \textbf{Qualité de code \& Linter :} Maven Checkstyle Plugin 3.6.0.
+    \item \textbf{Gestion des dépendances et Build :} Apache Maven.
+    \item \textbf{Qualité de code et Linter :} Maven Checkstyle Plugin 3.6.0.
     \item \textbf{Base de données :} MariaDB 11 en production / Docker, et H2 Database en mémoire pour l'exécution des tests.
     \item \textbf{Traitement XML :} Jakarta XML Binding (JAXB 4.0), Saxon-HE 12.9 (moteur XSLT 3.0), Jackson XML.
     \item \textbf{Moteur de rendu Web :} Thymeleaf.
-    \item \textbf{Conteneurisation \& CI :} Docker, Docker Compose, GitHub Actions.
+    \item \textbf{Conteneurisation et CI :} Docker, Docker Compose, GitHub Actions.
 \end{itemize}
 
 \newpage
@@ -167,7 +151,7 @@ L'application expose ses fonctionnalités à travers deux interfaces complément
     \caption{Synthèse des points d'accès de l'application SEPA26}
 \end{table}
 
-\section{Usine Logicielle, Conteneurisation \& CI/CD}
+\section{Usine Logicielle, Conteneurisation et CI/CD}
 
 Pour garantir un déploiement fiable et reproductible sur n'importe quel environnement, le projet s'appuie sur une infrastructure conteneurisée complète.
 
@@ -209,7 +193,7 @@ La configuration de l'infrastructure est externalisée via des fichiers d'enviro
 Un workflow GitHub Actions automatisé (\texttt{.github/workflows/ci.yml}) valide l'intégrité du code à chaque \textit{push} et \textit{pull request} :
 \begin{enumerate}[leftmargin=*]
     \item \textbf{Vérification du code (\textit{Checkstyle}) :} Exécution du linter (\texttt{mvn checkstyle:check}) pour valider les règles de nommage et l'absence d'imports superflus.
-    \item \textbf{Compilation et tests (\textit{Build \& Test}) :} Mise en place de Java 25 (Temurin) avec cache Maven et exécution des tests unitaires (\texttt{mvn clean test}).
+    \item \textbf{Compilation et tests (\textit{Build et Test}) :} Mise en place de Java 25 (Temurin) avec cache Maven et exécution des tests unitaires (\texttt{mvn clean test}).
     \item \textbf{Validation du conteneur (\textit{Docker Build}) :} Construction de l'image Docker multi-stage à partir du contexte applicatif (\texttt{docker build -t sepa26-app:latest ./app}).
 \end{enumerate}
 
