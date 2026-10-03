@@ -218,7 +218,7 @@ Un workflow GitHub Actions automatisé (\texttt{.github/workflows/ci.yml}) valid
 \appendix
 \section{Annexe : Catalogue Exhaustif des Classes et Composants}
 
-Ce catalogue détaille l'ensemble des classes, interfaces et records développés au sein du projet SEPA26, avec leur localisation, leur type et leur responsabilité métier.
+Ce catalogue détaille l'ensemble des classes, interfaces et records développés au sein du projet SEPA26, avec leur localisation, leur type et leur responsabilité métier. Conformément aux principes de conception SOLID et DRY, le modèle de données est entièrement découplé en entités indépendantes et objets de valeur (\texttt{@Embeddable}) réutilisables.
 
 \small
 \setlength{\tabcolsep}{6pt}
@@ -243,9 +243,9 @@ SepaWebController \newline \normalfont\footnotesize\textit{Contrôleur Web} & Co
 
 \multicolumn{2}{|l|}{\cellcolor{blue!10}\textbf{Services Métier et Traitement XML (\texttt{fr.univrouen.sepa26.services})}} \\ \hline
 SepaService \newline \normalfont\footnotesize\textit{Service Métier} & Façade métier coordonnant la persistance JPA, le contrôle d'unicité des virements et la délégation aux services XML. \\ \hline
-XmlValidationService \newline \normalfont\footnotesize\textit{Interface} & Contrat du service de validation des flux XML selon les schémas XSD. \\ \hline
+XmlValidation\-Service \newline \normalfont\footnotesize\textit{Interface} & Contrat du service de validation des flux XML selon les schémas XSD. \\ \hline
 XmlValidation\-ServiceImpl \newline \normalfont\footnotesize\textit{Implémentation} & Validation XSD avec mise en cache thread-safe du schéma sepa26.xsd. \\ \hline
-XmlSerializationService \newline \normalfont\footnotesize\textit{Interface} & Contrat du service de sérialisation et désérialisation XML JAXB. \\ \hline
+XmlSerialization\-Service \newline \normalfont\footnotesize\textit{Interface} & Contrat du service de sérialisation et désérialisation XML JAXB. \\ \hline
 XmlSerialization\-ServiceImpl \newline \normalfont\footnotesize\textit{Implémentation} & Sérialisation JAXB avec mise en cache du JAXBContext réutilisable. \\ \hline
 XsltTransformation\-Service \newline \normalfont\footnotesize\textit{Interface} & Contrat du service de transformation de documents XML en HTML via XSLT. \\ \hline
 EndpointDocumentation\-Service \newline \normalfont\footnotesize\textit{Interface} & Contrat fournissant les métadonnées de documentation des points d'accès. \\ \hline
@@ -262,12 +262,29 @@ DocumentRepository \newline \normalfont\footnotesize\textit{Interface Spring Dat
 \multicolumn{2}{|l|}{\cellcolor{blue!10}\textbf{Initialisation (\texttt{fr.univrouen.sepa26.init})}} \\ \hline
 DataInitializer \newline \normalfont\footnotesize\textit{Composant CommandLineRunner} & Insertion automatique de deux documents types au démarrage si la base est vide. \\ \hline
 
-\multicolumn{2}{|l|}{\cellcolor{blue!10}\textbf{Modèle Métier ISO 20022 (\texttt{fr.univrouen.sepa26.model})}} \\ \hline
-Document \newline \normalfont\footnotesize\textit{Entité Racine JPA/JAXB} & Entité racine représentant le document ISO 20022 complet. \\ \hline
-CstmrDrctDbtInitn \newline \normalfont\footnotesize\textit{Sous-entité Document} & Bloc d'initiation du prélèvement SEPA direct. \\ \hline
-GrpHdr \newline \normalfont\footnotesize\textit{Sous-entité Document} & En-tête de lot (identifiant, horodatage, total de contrôle, nombre d'opérations). \\ \hline
-PmtInf \newline \normalfont\footnotesize\textit{Sous-entité Document} & Informations de paiement regroupant créancier, date d'échéance et transactions. \\ \hline
-DrctDbtTxInf \newline \normalfont\footnotesize\textit{Sous-entité Document} & Transaction unitaire élémentaire (débiteur, montant, mandat et compte). \\ \hline
+\multicolumn{2}{|l|}{\cellcolor{blue!10}\textbf{Entités JPA du Domaine (\texttt{fr.univrouen.sepa26.model})}} \\ \hline
+Document \newline \normalfont\footnotesize\textit{Entité Racine JPA/JAXB} & Racine d'agrégat (table \texttt{document}) liant l'identifiant technique au bloc d'initiation. \\ \hline
+CstmrDrctDbtInitn \newline \normalfont\footnotesize\textit{Entité JPA} & Bloc d'initiation client (table \texttt{cstmr\_direct\_debit\_initiation}), associant l'en-tête \texttt{GrpHdr} et les lots \texttt{PmtInf}. \\ \hline
+GrpHdr \newline \normalfont\footnotesize\textit{Entité JPA} & En-tête de message (table \texttt{grp\_hdr}) : identifiant de message, date de création, nombre d'opérations et somme de contrôle. \\ \hline
+PmtInf \newline \normalfont\footnotesize\textit{Entité JPA} & Lot d'instructions de paiement (table \texttt{payment\_info}) regroupant le créancier, la date d'échéance et les transactions. \\ \hline
+DrctDbtTxInf \newline \normalfont\footnotesize\textit{Entité JPA} & Transaction unitaire élémentaire (table \texttt{transaction\_info}) : montant instruit, débiteur, mandat et compte bancaire. \\ \hline
+
+\multicolumn{2}{|l|}{\cellcolor{blue!10}\textbf{Objets de Valeur Réutilisables (\texttt{fr.univrouen.sepa26.model})}} \\ \hline
+Party \newline \normalfont\footnotesize\textit{Composant @Embeddable} & Acteur d'une transaction, mutualisé selon le principe DRY pour l'émetteur (\texttt{InitgPty}), le créancier (\texttt{Cdtr}) et le débiteur (\texttt{Dbtr}). \\ \hline
+Account \newline \normalfont\footnotesize\textit{Composant @Embeddable} & Compte bancaire réutilisé pour \texttt{CdtrAcct} et \texttt{DbtrAcct}, encapsulant l'identifiant de compte. \\ \hline
+AccountId \newline \normalfont\footnotesize\textit{Composant @Embeddable} & Identifiant de compte bancaire au format normalisé IBAN ou identifiant privé. \\ \hline
+Agent \newline \normalfont\footnotesize\textit{Composant @Embeddable} & Établissement financier mandataire réutilisé pour la banque du créancier (\texttt{CdtrAgt}) et du débiteur (\texttt{DbtrAgt}). \\ \hline
+FinInstnId \newline \normalfont\footnotesize\textit{Composant @Embeddable} & Identifiant d'institution financière encapsulant le code BIC de l'établissement. \\ \hline
+PaymentTypeInfo \newline \normalfont\footnotesize\textit{Composant @Embeddable} & Spécification du type de paiement SEPA (niveau de service, instrument local, séquence). \\ \hline
+ServiceLevel \newline \normalfont\footnotesize\textit{Composant @Embeddable} & Niveau de service du protocole bancaire (code \texttt{SEPA}). \\ \hline
+LocalInstrument \newline \normalfont\footnotesize\textit{Composant @Embeddable} & Spécification de l'instrument financier local utilisé (code \texttt{SEPA}). \\ \hline
+DrctDbtTx \newline \normalfont\footnotesize\textit{Composant @Embeddable} & Informations techniques du prélèvement direct encapsulant le mandat associé. \\ \hline
+MndtRltdInf \newline \normalfont\footnotesize\textit{Composant @Embeddable} & Informations du mandat SEPA (Référence Unique de Mandat RUM et date de signature). \\ \hline
+InstdAmt \newline \normalfont\footnotesize\textit{Composant @Embeddable} & Montant instruit avec valeur numérique décimale et attribut de devise (\texttt{ccy="EUR"}). \\ \hline
+AccountSchemeId \newline \normalfont\footnotesize\textit{Composant @Embeddable} & Enveloppe de l'identifiant de schéma du créancier (ICS). \\ \hline
+PrivateId \newline \normalfont\footnotesize\textit{Composant @Embeddable} & Identification privée de l'organisme créancier pour le schéma d'émission. \\ \hline
+OtherIdentification \newline \normalfont\footnotesize\textit{Composant @Embeddable} & Identifiant de créancier SEPA (ICS) avec nom de schéma propriétaire. \\ \hline
+SchemeName \newline \normalfont\footnotesize\textit{Composant @Embeddable} & Nom du système de schéma propriétaire (\texttt{SEPA}). \\ \hline
 
 \multicolumn{2}{|l|}{\cellcolor{blue!10}\textbf{Objets de Transfert DTO (\texttt{fr.univrouen.sepa26.dto})}} \\ \hline
 ValidationResult \newline \normalfont\footnotesize\textit{Record DTO} & Record immutable contenant l'état de validation XSD et l'erreur associée. \\ \hline
